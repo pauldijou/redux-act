@@ -1,0 +1,30 @@
+{
+  "name": "redux-act",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "description": "An opinionated lib to create actions and reducers for Redux",
+  "keywords": ["redux", "flux", "action", "reducer"],
+  "main": "lib/index.js",
+  "homepage": "https://github.com/pauldijou/redux-act",
+  "author": {
+    "name": "Paul Dijou",
+    "url": "http://pauldijou.fr"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pauldijou/redux-act"
+  },
+  "bugs": {
+    "url": "https://github.com/pauldijou/redux-act/issues"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5",
+    "chai": "^3.0.0",
+    "mocha-better-spec-reporter": "^2.1.0",
+    "babel": "^5.8.21",
+    "redux": "1.0.0"
+  },
+  "scripts": {
+    "test": "mocha --sort --compilers js:babel/register --reporter mocha-better-spec-reporter"
+  }
+}
