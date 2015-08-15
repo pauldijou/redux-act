@@ -89,6 +89,8 @@ append('b', 'c', 'd'); // stringStore.getState() === 'abcd'
 
 - **Why having two syntax to create reducers?** The one with only a map of `action => reduce function` doesn't allow much. This is why the other one is here, in case you would need a small state inside the reducer, having something similar as an actor, or whatever you feel like.
 
+- **Inside a reducer, why is it `(state, payload)=> newState` rather than `(state, action)=> newState`?** You can find more info about that on the `createReducer` API below, but basically, that's because an action is composed of metadata handled by the lib and your payload. Since you only care about that part, better to have it directly. You can switch back to the full action if necessary of course.
+
 - **Why have you done that? Aren't string constants good enough?** I know that the Redux doc states that such magic isn't really good, that saving a few lines of code isn't worth hiding such logic. I can understand that. And don't get me wrong, the main goal of this lib isn't to reduce boilerplate (even if I like that it does) but to use the actions themselves as keys for the reducers rather than strings which are error prone. You never know what the new dev on your project might do... Maybe (s)he will not realize that the new constant (s)he just introduced was already existing and now everything is broken and a wormhole will appear and it will be the end of mankind. Let's prevent that!
 
 ## API
@@ -105,7 +107,7 @@ const betterAction = createAction('This is better!');
 // Support multiple arguments by merging them
 const multipleAction = createAction((text, checked)=> ({text, checked}))
 // Again, better to add a description
-const bestAction = createAction('best', (text, checked)=> ({text, checked}))
+const bestAction = createAction('Best. Action. Ever.', (text, checked)=> ({text, checked}))
 ```
 
 When calling an action creator, the returned object will have the following properties:
@@ -149,9 +151,9 @@ action();
 
 ### createReducer(handlers: Object | Function, [default state: Any])
 
-It's kind of the same syntax of the `Array.prototype.reduce` function. You can specify how to reduce as the first argument and the accumulator, or default state, as the second argument. The default state is optional since you can retrieve it from the store when creating it but you should consider always having a default state inside a reducer, especially if you want to use it with `combineReducers` which make such default state mandatory.
+It's kind of the same syntax as the `Array.prototype.reduce` function. You can specify how to reduce as the first argument and the accumulator, or default state, as the second one. The default state is optional since you can retrieve it from the store when creating it but you should consider always having a default state inside a reducer, especially if you want to use it with `combineReducers` which make such default state mandatory.
 
-There are two patterns to create a reducer. One is passing an object as a map of `action creators` to `reduce functions`. Such function has the following signature: `(previousState, payload)=> return newState;`. The other one is using a function factory. Rather than trying to explaining it, just read the following examples.
+There are two patterns to create a reducer. One is passing an object as a map of `action creators` to `reduce functions`. Such function has the following signature: `(previousState, payload)=> newState`. The other one is using a function factory. Rather than trying to explaining it, just read the following examples.
 
 ```javascript
 const increment = createAction();
@@ -170,7 +172,7 @@ const reducerFactory = createReducer(function (on) {
 }, 0);
 ```
 
-Since an action is an object with some metadata (`id` and `type`) and a `payload` (which is your actual data), all reduce functions directly take the payload as their 2nd argument by default rather than the whole action since all other properties are handled by the lib and you shouldn't care for them anyway. If you really need to use the full action, you can change the behavior of a reducer.
+Since an action is an object with some metadata (`id` and `type`) and a `payload` (which is your actual data), all reduce functions directly take the payload as their 2nd argument by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
 
 ```javascript
 const add = createAction();
