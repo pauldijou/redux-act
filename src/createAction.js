@@ -19,15 +19,23 @@ export default function createAction(name, mapper = identity) {
 
   let actionStores = undefined;
 
+  function setupPayload(payload) {
+    return {
+      id: action.id,
+      type: action.type,
+      payload: payload
+    };
+  }
+
   function actionCreator(...args) {
-    const payload = mapper.apply(undefined, args);
+    const payloaded = setupPayload(mapper.apply(undefined, args));
 
     if (Array.isArray(actionStores)) {
-      return actionStores.map(store=> store.dispatch({...action, payload}));
+      return actionStores.map(store=> store.dispatch(payloaded));
     } else if (actionStores && actionStores.dispatch) {
-      return actionStores.dispatch({...action, payload});
+      return actionStores.dispatch(payloaded);
     } else {
-      return {...action, payload};
+      return payloaded;
     }
   }
 
