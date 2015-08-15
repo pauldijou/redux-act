@@ -60,12 +60,12 @@ describe('createAction', function () {
 
   it('should dispatch actions', function () {
     reducer = createReducer({
-      [firstAction]: (state, action)=> {
-        state.first += action.payload;
+      [firstAction]: (state, payload)=> {
+        state.first += payload;
         return state;
       },
-      [secondAction]: (state, action)=> {
-        state.second += '' + action.payload.one + action.payload.two + action.payload.three + ' - ';
+      [secondAction]: (state, payload)=> {
+        state.second += '' + payload.one + payload.two + payload.three + ' - ';
         return state;
       }
     });
@@ -111,6 +111,7 @@ describe('createAction', function () {
     const store = createStore(reducer);
     const action = createAction().bindTo(store);
     actions[action] = (state)=> state + 1;
+
     action();
     expect(store.getState()).to.equal(1);
     action();

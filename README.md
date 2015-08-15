@@ -27,7 +27,7 @@ const [increment, decrement] = ['inc', 'dec'].map(createAction);
 const counterReducer = createReducer({
   [increment]: (state)=> state + 1,
   [decrement]: (state)=> state - 1,
-  [add]: (state, action)=> state + action.payload
+  [add]: (state, payload)=> state + payload
 }, 0); // <-- This is the default state
 
 // Create the store
@@ -59,8 +59,8 @@ const append = createAction('optional description', (...args)=> args.join(''));
 
 // There is another pattern to create reducers
 const stringReducer = createReducer(function (on) {
-  on(append, (state, action)=> state += action.payload);
-  on(replace, (state, action)=> state = action.payload);
+  on(append, (state, payload)=> state += payload);
+  on(replace, (state, payload)=> state = payload);
   // Warning! If you use the same action twice,
   // the second one will override the previous one.
 }, 'missing a lette'); // <-- Default state
@@ -151,7 +151,7 @@ action();
 
 It's kind of the same syntax of the `Array.prototype.reduce` function. You can specify how to reduce as the first argument and the accumulator, or default state, as the second argument. The default state is optional since you can retrieve it from the store when creating it but you should consider always having a default state inside a reducer, especially if you want to use it with `combineReducers` which make such default state mandatory.
 
-There are two patterns to create a reducer. One is passing an object as a map of `action creators` to `reduce functions`. Such function has the following signature: `(previousState, action)=> return newState;`. The other one is using a function factory. Rather than trying to explaining it, just read the following examples.
+There are two patterns to create a reducer. One is passing an object as a map of `action creators` to `reduce functions`. Such function has the following signature: `(previousState, payload)=> return newState;`. The other one is using a function factory. Rather than trying to explaining it, just read the following examples.
 
 ```javascript
 const increment = createAction();
@@ -160,14 +160,29 @@ const add = createAction();
 // First pattern
 const reducerMap = createReducer({
   [increment]: (state)=> state + 1,
-  [add]: (state, action)=> state + action.payload
+  [add]: (state, payload)=> state + payload
 }, 0);
 
 // Second pattern
 const reducerFactory = createReducer(function (on) {
   on(increment, (state)=> state + 1);
-  on(add, (state, action)=> state + action.payload);
+  on(add, (state, payload)=> state + payload);
 }, 0);
+```
+
+Since an action is an object with some metadata (`id` and `type`) and a `payload` (which is your actual data), all reduce functions directly take the payload as their 2nd argument by default rather than the whole action since all other properties are handled by the lib and you shouldn't care for them anyway. If you really need to use the full action, you can change the behavior of a reducer.
+
+```javascript
+const add = createAction();
+const sub = createAction();
+const reducer = createReducer({
+  [add]: (state, action)=> state + action.payload,
+  [sub]: (state, action)=> state - action.payload
+}, 0);
+
+reducer.options({
+  payload: false
+});
 ```
 
 **Pro Tip** You can dynamically add and remove actions. There are two patterns to do so.
@@ -219,8 +234,8 @@ export const sub = createAction('Sub');
 // reducer.js
 import * as actions from 'actions.js';
 export default createReducer({
-  [actions.add]: (state, action)=> state + action.payload,
-  [actions.sub]: (state, action)=> state - action.payload
+  [actions.add]: (state, payload)=> state + payload,
+  [actions.sub]: (state, payload)=> state - payload
 }, 0);
 
 // store.js
@@ -235,7 +250,7 @@ export default store;
 
 ## Thanks
 
-A big thank to both @gaearon for creating [Redux](https://github.com/rackt/redux) and @AlexGalays for creating [fluxx](https://github.com/AlexGalays/fluxx) which I take a lot of inspiration from.
+A big thank to both [@gaearon](https://github.com/gaearon) for creating [Redux](https://github.com/rackt/redux) and [@AlexGalays](https://github.com/AlexGalays) for creating [fluxx](https://github.com/AlexGalays/fluxx) which I took a lot of inspiration from.
 
 ## Tests
 

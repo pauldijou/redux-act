@@ -15,7 +15,7 @@ describe('README', function () {
     const counterReducer = createReducer({
       [increment]: (state)=> state + 1,
       [decrement]: (state)=> state - 1,
-      [add]: (state, action)=> state + action.payload
+      [add]: (state, payload)=> state + payload
     }, 0); // <-- This is the default state
 
     // Create the store
@@ -46,8 +46,8 @@ describe('README', function () {
 
     // There is another pattern to create reducers
     const stringReducer = createReducer(function (on) {
-      on(append, (state, action)=> state += action.payload);
-      on(replace, (state, action)=> state = action.payload);
+      on(append, (state, payload)=> state += payload);
+      on(replace, (state, payload)=> state = payload);
       // Warning! If you use the same action twice,
       // the second one will override the previous one.
     }, 'missing a lette'); // <-- Default state
@@ -118,13 +118,13 @@ describe('README', function () {
     // First pattern
     const reducerMap = createReducer({
       [increment]: (state)=> state + 1,
-      [add]: (state, action)=> state + action.payload
+      [add]: (state, payload)=> state + payload
     }, 0);
 
     // Second pattern
     const reducerFactory = createReducer(function (on) {
       on(increment, (state)=> state + 1);
-      on(add, (state, action)=> state + action.payload);
+      on(add, (state, payload)=> state + payload);
     }, 0);
   });
 

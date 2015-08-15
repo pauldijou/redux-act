@@ -14,12 +14,12 @@ describe('createReducer', function () {
 
     firstReducer = createReducer({
       [increment]: (state)=> state + 1,
-      [add]: (state, action)=> state + action.payload
+      [add]: (state, payload)=> state + payload
     }, 0);
 
     secondReducer = createReducer(function (on) {
       on(decrement, (state)=> state - 1);
-      on(sub, (state, action)=> state - action.payload);
+      on(sub, (state, payload)=> state - payload);
     }, 42);
   });
 
@@ -73,5 +73,80 @@ describe('createReducer', function () {
     expect(store.getState()).to.deep.equal({up: 42, down: 10});
     store.dispatch(sub(10));
     expect(store.getState()).to.deep.equal({up: 42, down: 0});
+  });
+
+  it('should have dynamic actions', function () {
+    const handlers = {};
+    const reducer = createReducer(handlers, 0);
+    const store = createStore(reducer);
+    const inc = createAction().bindTo(store);
+    handlers[inc] = (state)=> state + 1;
+
+    inc();
+    expect(store.getState()).to.equal(1);
+    inc();
+    expect(store.getState()).to.equal(2);
+    inc();
+    expect(store.getState()).to.equal(3);
+
+    delete handlers[inc];
+
+    inc();
+    expect(store.getState()).to.equal(3);
+    inc();
+    expect(store.getState()).to.equal(3);
+  });
+
+  it('should support on and off methods', function () {
+    const reducer = createReducer({}, 0);
+    const store = createStore(reducer);
+    const inc = createAction().bindTo(store)
+
+    reducer.on(inc, state=> state + 1)
+
+    inc();
+    expect(store.getState()).to.equal(1);
+    inc();
+    expect(store.getState()).to.equal(2);
+    inc();
+    expect(store.getState()).to.equal(3);
+
+    reducer.off(inc);
+
+    inc();
+    expect(store.getState()).to.equal(3);
+    inc();
+    expect(store.getState()).to.equal(3);
+  });
+
+  it('should update its options', function () {
+    const add = createAction();
+    const reducer = createReducer({
+      [add]: (state, action)=> state + action.payload
+    }, 0);
+    reducer.options({payload: false});
+    const store = createStore(reducer);
+    add.bindTo(store);
+
+    add(3);
+    expect(store.getState()).to.equal(3);
+    add(2);
+    expect(store.getState()).to.equal(5);
+
+    reducer.on(add, (state, payload)=> state + payload);
+    reducer.options({payload: true});
+
+    add(-4);
+    expect(store.getState()).to.equal(1);
+    add(10);
+    expect(store.getState()).to.equal(11);
+
+    reducer.on(add, (state, action)=> state + action.payload);
+    reducer.options({payload: false});
+
+    add(30);
+    expect(store.getState()).to.equal(41);
+    add(1);
+    expect(store.getState()).to.equal(42);
   });
 });
