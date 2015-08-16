@@ -6,56 +6,73 @@ const expect = chai.expect;
 describe('createAction', function () {
   let firstAction, secondAction, reducer;
 
+  function testActionCreator(actionCreator) {
+    expect(actionCreator).to.be.a('function');
+    expect(actionCreator.toString).to.be.a('function');
+    expect(actionCreator.bindTo).to.be.a('function');
+  }
+
+  function testAction(action, payload, description) {
+    expect(action).to.be.an('object');
+    expect(action).to.have.all.keys('id', 'type', 'payload');
+    expect(action.id).to.be.a('number');
+    expect(action.type).to.be.a('string');
+    expect(action.payload).to.deep.equal(payload);
+    if (description !== undefined) {
+      expect(action.type).to.have.string(description);
+    }
+  }
+
+  it('should support all format', function () {
+    const simple = createAction();
+    const description = createAction('awesome description');
+    const args = createAction((num, text)=> ({one: num, text}));
+    const both = createAction('description', (id, content)=> ({id, content}));
+
+    testActionCreator(simple);
+    testActionCreator(description);
+    testActionCreator(args);
+    testActionCreator(both);
+
+    const simpleAction = simple(1);
+    const descriptionAction = description(true);
+    const argsAction = args(4, 'hello');
+    const bothAction = both(2, 'world');
+
+    testAction(simpleAction, 1);
+    testAction(descriptionAction, true, 'awesome description');
+    testAction(argsAction, {one: 4, text: 'hello'});
+    testAction(bothAction, {id: 2, content: 'world'}, 'description');
+  });
+
   it('should create one action creator', function () {
     firstAction = createAction();
-    expect(firstAction).to.be.a('function');
-    expect(firstAction.toString).to.be.a('function');
-    expect(firstAction.bindTo).to.be.a('function');
+    testActionCreator(firstAction);
   });
 
   it('should return a valid action', function () {
     const action = firstAction(42);
-    expect(action).to.be.an('object');
-    expect(action).to.have.all.keys('id', 'type', 'payload');
-    expect(action.id).to.be.a('number');
-    expect(action.type).to.be.a('string');
-    expect(action).to.have.property('payload', 42);
+    testAction(action, 42);
   });
 
   it('should return a valid action again', function () {
     const action = firstAction('a string');
-    expect(action).to.be.an('object');
-    expect(action).to.have.all.keys('id', 'type', 'payload');
-    expect(action.id).to.be.a('number');
-    expect(action.type).to.be.a('string');
-    expect(action).to.have.property('payload', 'a string');
+    testAction(action, 'a string');
   });
 
   it('should create a second action creator', function () {
     secondAction = createAction('second action', (one, two, three)=> ({one, two, three: three.join(', ')}));
-    expect(secondAction).to.be.a('function');
-    expect(secondAction.toString).to.be.a('function');
-    expect(secondAction.bindTo).to.be.a('function');
+    testActionCreator(secondAction);
   });
 
   it('should return a valid second action', function () {
     const action = secondAction(111, 'test', [1, 'a', true]);
-    expect(action).to.be.an('object');
-    expect(action).to.have.all.keys('id', 'type', 'payload');
-    expect(action.id).to.be.a('number');
-    expect(action.type).to.be.a('string');
-    expect(action.type).to.have.string('second action');
-    expect(action.payload).to.deep.equal({one: 111, two: 'test', three: '1, a, true'});
+    testAction(action, {one: 111, two: 'test', three: '1, a, true'}, 'second action');
   });
 
   it('should return a valid second action again', function () {
     const action = secondAction(true, 222, ['a', 'b', 'c', 'd']);
-    expect(action).to.be.an('object');
-    expect(action).to.have.all.keys('id', 'type', 'payload');
-    expect(action.id).to.be.a('number');
-    expect(action.type).to.be.a('string');
-    expect(action.type).to.have.string('second action');
-    expect(action.payload).to.deep.equal({one: true, two: 222, three: 'a, b, c, d'});
+    testAction(action, {one: true, two: 222, three: 'a, b, c, d'}, 'second action');
   });
 
   it('should dispatch actions', function () {
