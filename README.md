@@ -40,6 +40,22 @@ counterStore.dispatch(decrement()); // counterStore.getState() === 1
 counterStore.dispatch(add(5)); // counterStore.getState() === 6
 ```
 
+## FAQ
+
+- **Does it work with Redux devtools?** Yes.
+
+- **Do reducers work with combineReducers?** Of course, they are just normal reducers after all. Remember that according to the `combineReducers` checks, you will need to provide a default state when creating each reducer before combining them.
+
+- **How does it work?** There is not much magic. A generated id is assigned to each created action and will be used inside reducers instead of the string constants used inside Redux by default.
+
+- **Can you show how different it is from writing classic Redux?** Sure, you can check both commits to update [counter example](https://github.com/pauldijou/redux-act/commit/9e020137fb1b3e1e37d37c434032bec3c4e0873a) and [todomvc example](https://github.com/pauldijou/redux-act/commit/66a07913fdb36c9206e9bcbd5fa5577d1e6eceb7). You can also run both examples with `npm install && npm start` inside each folder.
+
+- **Why having two syntax to create reducers?** The one with only a map of `action => reduce function` doesn't allow much. This is why the other one is here, in case you would need a small state inside the reducer, having something similar as an actor, or whatever you feel like.
+
+- **Inside a reducer, why is it `(state, payload)=> newState` rather than `(state, action)=> newState`?** You can find more info about that on the `createReducer` API below, but basically, that's because an action is composed of metadata handled by the lib and your payload. Since you only care about that part, better to have it directly. You can switch back to the full action if necessary of course.
+
+- **Why have you done that? Aren't string constants good enough?** I know that the Redux doc states that such magic isn't really good, that saving a few lines of code isn't worth hiding such logic. I can understand that. And don't get me wrong, the main goal of this lib isn't to reduce boilerplate (even if I like that it does) but to use the actions themselves as keys for the reducers rather than strings which are error prone. You never know what the new dev on your project might do... Maybe (s)he will not realize that the new constant (s)he just introduced was already existing and now everything is broken and a wormhole will appear and it will be the end of mankind. Let's prevent that!
+
 ## Advanced usage
 
 ```javascript
@@ -78,20 +94,6 @@ append('r'); // stringStore.getState() === 'missing a letter'
 replace('a'); // stringStore.getState() === 'a'
 append('b', 'c', 'd'); // stringStore.getState() === 'abcd'
 ```
-
-## FAQ
-
-- **Does it work with Redux devtools?** Yes.
-
-- **Does the reducers work with combineReducers?** Of course, they are just normal reducers after all. Remember that according to the `combineReducers` checks, you will need to provide a default state when creating each reducer before combining them.
-
-- **How does it work?** There is not much magic. A generated id is assigned to each created action and will be used inside reducers instead of the string constants used inside Redux by default.
-
-- **Why having two syntax to create reducers?** The one with only a map of `action => reduce function` doesn't allow much. This is why the other one is here, in case you would need a small state inside the reducer, having something similar as an actor, or whatever you feel like.
-
-- **Inside a reducer, why is it `(state, payload)=> newState` rather than `(state, action)=> newState`?** You can find more info about that on the `createReducer` API below, but basically, that's because an action is composed of metadata handled by the lib and your payload. Since you only care about that part, better to have it directly. You can switch back to the full action if necessary of course.
-
-- **Why have you done that? Aren't string constants good enough?** I know that the Redux doc states that such magic isn't really good, that saving a few lines of code isn't worth hiding such logic. I can understand that. And don't get me wrong, the main goal of this lib isn't to reduce boilerplate (even if I like that it does) but to use the actions themselves as keys for the reducers rather than strings which are error prone. You never know what the new dev on your project might do... Maybe (s)he will not realize that the new constant (s)he just introduced was already existing and now everything is broken and a wormhole will appear and it will be the end of mankind. Let's prevent that!
 
 ## API
 
@@ -226,7 +228,7 @@ increment(); // store.getState() === 2
 
 ### bindAll(actionCreators: Object | Array, stores: Object | Array)
 
-A common pattern is to export a set of action creators as an object. If you to bind them all to a store, there is this super small helper. You can also use an array of action creators. And since you can bind to one or several stores, you can specify either one store or an array of stores.
+A common pattern is to export a set of action creators as an object. If you want to bind all of them to a store, there is this super small helper. You can also use an array of action creators. And since you can bind to one or several stores, you can specify either one store or an array of stores.
 
 ```javascript
 // actions.js
@@ -234,15 +236,15 @@ export const add = createAction('Add');
 export const sub = createAction('Sub');
 
 // reducer.js
-import * as actions from 'actions.js';
+import * as actions from 'actions';
 export default createReducer({
   [actions.add]: (state, payload)=> state + payload,
   [actions.sub]: (state, payload)=> state - payload
 }, 0);
 
 // store.js
-import * as actions from 'actions.js';
-import reducer from 'reducer.js';
+import * as actions from 'actions';
+import reducer from 'reducer';
 
 const store = createStore(reducer);
 bindAll(actions, store);
