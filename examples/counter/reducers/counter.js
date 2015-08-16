@@ -1,12 +1,7 @@
-import { INCREMENT_COUNTER, DECREMENT_COUNTER } from '../constants/ActionTypes';
+import { createReducer } from 'redux-act';
+import * as actions from '../actions/CounterActions';
 
-export default function counter(state = 0, action) {
-  switch (action.type) {
-  case INCREMENT_COUNTER:
-    return state + 1;
-  case DECREMENT_COUNTER:
-    return state - 1;
-  default:
-    return state;
-  }
-}
+export default createReducer({
+  [actions.increment]: (state)=> state + 1,
+  [actions.decrement]: (state)=> state - 1
+}, 0);

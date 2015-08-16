@@ -1,2 +1,2 @@
-export const INCREMENT_COUNTER = 'INCREMENT_COUNTER';
-export const DECREMENT_COUNTER = 'DECREMENT_COUNTER';
+// Remove all action constants
+// but keeping the file so it appears on the git diff

@@ -1,16 +1,7 @@
-import { INCREMENT_COUNTER, DECREMENT_COUNTER } from '../constants/ActionTypes';
+import { createAction } from 'redux-act';
 
-export function increment() {
-  return {
-    type: INCREMENT_COUNTER
-  };
-}
-
-export function decrement() {
-  return {
-    type: DECREMENT_COUNTER
-  };
-}
+export const increment = createAction('Increment counter');
+export const decrement = createAction('Decrement counter');
 
 export function incrementIfOdd() {
   return (dispatch, getState) => {
