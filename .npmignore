@@ -1,2 +1,5 @@
 src
 test
+coverage
+examples
+.babelrc
