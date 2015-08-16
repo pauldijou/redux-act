@@ -1,42 +1,8 @@
-import * as types from '../constants/ActionTypes';
+import { createAction } from 'redux-act';
 
-export function addTodo(text) {
-  return {
-    type: types.ADD_TODO,
-    text
-  };
-}
-
-export function deleteTodo(id) {
-  return {
-    type: types.DELETE_TODO,
-    id
-  };
-}
-
-export function editTodo(id, text) {
-  return {
-    type: types.EDIT_TODO,
-    id,
-    text
-  };
-}
-
-export function markTodo(id) {
-  return {
-    type: types.MARK_TODO,
-    id
-  };
-}
-
-export function markAll() {
-  return {
-    type: types.MARK_ALL
-  };
-}
-
-export function clearMarked() {
-  return {
-    type: types.CLEAR_MARKED
-  };
-}
+export const addTodo = createAction('Add new todo');
+export const deleteTodo = createAction('Delete todo');
+export const editTodo = createAction('Edit todo', (id, text)=> ({id, text}));
+export const markTodo = createAction('Mark todo');
+export const markAll = createAction('Mark all todos');
+export const clearMarked = createAction('Clear all marked todos');

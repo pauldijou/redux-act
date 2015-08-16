@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import Header from '../components/Header';
 import MainSection from '../components/MainSection';
-import * as TodoActions from '../actions/TodoActions';
+import * as actions from '../actions/TodoActions';
 
 class TodoApp extends Component {
   render() {
-    const { todos, actions } = this.props;
+    const { todos } = this.props;
 
     return (
       <div>
@@ -24,10 +24,7 @@ function mapState(state) {
   };
 }
 
-function mapDispatch(dispatch) {
-  return {
-    actions: bindActionCreators(TodoActions, dispatch)
-  };
-}
+// Since we already did bind all our actions to the store,
+// no need to do it again in each component
 
-export default connect(mapState, mapDispatch)(TodoApp);
+export default connect(mapState)(TodoApp);
