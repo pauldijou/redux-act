@@ -32,7 +32,7 @@ export default function createAction(name, mapper = identity) {
 
     if (Array.isArray(actionStores)) {
       return actionStores.map(store=> store.dispatch(payloaded));
-    } else if (actionStores && actionStores.dispatch) {
+    } else if (actionStores) {
       return actionStores.dispatch(payloaded);
     } else {
       return payloaded;
@@ -47,4 +47,4 @@ export default function createAction(name, mapper = identity) {
   };
 
   return actionCreator;
-}
+};
