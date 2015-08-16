@@ -258,7 +258,7 @@ A big thank to both [@gaearon](https://github.com/gaearon) for creating [Redux](
 
 ## Tests
 
-If you need to run the tests, just use `npm test`.
+If you need to run the tests, just use `npm test` or `npm run coverage` if you want to generate the coverage report.
 
 ## License
 
