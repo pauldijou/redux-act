@@ -1,6 +1,6 @@
 # redux-act
 
-An opinionated lib to create actions and reducers for [Redux](https://github.com/rackt/redux). The main goal is to use the actions themselves as references inside the reducers rather than string constants.
+An opinionated lib to create actions and reducers for [Redux](https://github.com/rackt/redux). The main goal is to use actions themselves as references inside the reducers rather than string constants.
 
 ## Install
 
@@ -34,6 +34,7 @@ const add = createAction('add some stuff');
 const [increment, decrement] = ['inc', 'dec'].map(createAction);
 
 // Create a reducer
+// (ES6 syntax, see Advanced usage below for an alternative for ES5)
 const counterReducer = createReducer({
   [increment]: (state)=> state + 1,
   [decrement]: (state)=> state - 1,
@@ -60,7 +61,7 @@ counterStore.dispatch(add(5)); // counterStore.getState() === 6
 
 - **Can you show how different it is from writing classic Redux?** Sure, you can check both commits to update [counter example](https://github.com/pauldijou/redux-act/commit/9e020137fb1b3e1e37d37c434032bec3c4e0873a) and [todomvc example](https://github.com/pauldijou/redux-act/commit/66a07913fdb36c9206e9bcbd5fa5577d1e6eceb7). You can also run both examples with `npm install && npm start` inside each folder.
 
-- **Why having two syntax to create reducers?** The one with only a map of `action => reduce function` doesn't allow much. This is why the other one is here, in case you would need a small state inside the reducer, having something similar as an actor, or whatever you feel like.
+- **Why having two syntax to create reducers?** The one with only a map of `action => reduce function` doesn't allow much. This is why the other one is here, in case you would need a small state inside the reducer, having something similar as an actor, or whatever you feel like. Also, one of the syntax is ES6 only.
 
 - **Inside a reducer, why is it `(state, payload)=> newState` rather than `(state, action)=> newState`?** You can find more info about that on the `createReducer` API below, but basically, that's because an action is composed of metadata handled by the lib and your payload. Since you only care about that part, better to have it directly. You can switch back to the full action if necessary of course.
 
@@ -72,7 +73,7 @@ counterStore.dispatch(add(5)); // counterStore.getState() === 6
 import { createStore } from 'redux';
 import { createAction, createReducer } from 'redux-act';
 
-// When creating actions, the description is optional
+// When creating action creators, the description is optional
 // it will only be used for devtools and logging stuff.
 // It's better to put something but feel free to leave it empty if you want to.
 const replace = createAction();
@@ -84,6 +85,7 @@ const replace = createAction();
 const append = createAction('optional description', (...args)=> args.join(''));
 
 // There is another pattern to create reducers
+// and it works fine with ES5! (maybe even ES3 \o/)
 const stringReducer = createReducer(function (on) {
   on(append, (state, payload)=> state += payload);
   on(replace, (state, payload)=> state = payload);
@@ -109,7 +111,7 @@ append('b', 'c', 'd'); // stringStore.getState() === 'abcd'
 
 ### createAction([description: String], [payload reducer: Function])
 
-Create a new action (again, according to Redux glossary, it's actually an action creator). If you specify a description, it will be used for devtools and logging. By default, `createAction` will return a function and its first argument will be used as the payload when dispatching the action. If you need to support multiple arguments, you need to specify a **payload reducer** in order to merge all arguments into one unique payload.
+Create a new action creator. If you specify a description, it will be used by devtools. By default, `createAction` will return a function and its first argument will be used as the payload when dispatching the action. If you need to support multiple arguments, you need to specify a **payload reducer** in order to merge all arguments into one unique payload.
 
 ```javascript
 // Super simple action
@@ -165,7 +167,7 @@ action();
 
 It's kind of the same syntax as the `Array.prototype.reduce` function. You can specify how to reduce as the first argument and the accumulator, or default state, as the second one. The default state is optional since you can retrieve it from the store when creating it but you should consider always having a default state inside a reducer, especially if you want to use it with `combineReducers` which make such default state mandatory.
 
-There are two patterns to create a reducer. One is passing an object as a map of `action creators` to `reduce functions`. Such function has the following signature: `(previousState, payload)=> newState`. The other one is using a function factory. Rather than trying to explaining it, just read the following examples.
+There are two patterns to create a reducer. One is passing an object as a map of `action creators` to `reduce functions`. Such functions have the following signature: `(previousState, payload)=> newState`. The other one is using a function factory. Rather than trying to explaining it, just read the following examples.
 
 ```javascript
 const increment = createAction();
@@ -202,7 +204,7 @@ reducer.options({
 **Pro Tip** You can dynamically add and remove actions. There are two patterns to do so.
 
 ```javascript
-// Adding and deleting properties of the handlers object
+// Adding and deleting properties from the handlers object
 const handlers = {};
 const reducer = createReducer(handlers, 0);
 const store = createStore(reducer);
