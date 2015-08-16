@@ -8,6 +8,16 @@ An opinionated lib to create actions and reducers for [Redux](https://github.com
 npm install redux-act --save
 ```
 
+## Content
+
+- [Usage](#usage)
+- [FAQ](#faq)
+- [Avanced usage](#advanced-usage)
+- [API](#api)
+  - [createAction](#createactiondescription-string-payload-reducer-function)
+  - [createReducer](#createreducerhandlers-object--function-default-state-any)
+  - [bindAll](#bindallactioncreators-object--array-stores-object--array)
+
 ## Usage
 
 Even if there is a function named `createAction`, it actually creates an `action creator` according to Redux glossary. It was just a bit overkill to name the function `createActionCreator`. If you are not sure if something is an action or an action creator, just remember that actions are plain objects while action creators are functions.
