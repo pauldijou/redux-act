@@ -133,11 +133,11 @@ When calling an action creator, the returned object will have the following prop
 ```javascript
 const addTodo = createAction('Add todo');
 addTodo('content');
-// return { id: 1, type: '[1] Add todo', payload: 'content' }
+// return { __id__: 1, type: '[1] Add todo', payload: 'content' }
 
 const editTodo = createAction('Edit todo', (id, content)=> ({id, content}));
 editTodo(42, 'the answer');
-// return { id: 2, type: '[2] Edit todo', payload: {id: 42, content: 'the answer'} }
+// return { __id__: 2, type: '[2] Edit todo', payload: {id: 42, content: 'the answer'} }
 ```
 
 Remember that you still need to dispatch those actions. If you already have one or more stores, you can bind the action to them so it will be automatically dispatched using the `bindTo` function. Notice that each call to `bindTo` will override any previous call.

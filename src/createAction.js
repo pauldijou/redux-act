@@ -1,3 +1,5 @@
+import { ID } from './constants';
+
 let id = 0;
 
 const identity = arg => arg;
@@ -21,7 +23,7 @@ export default function createAction(name, mapper = identity) {
 
   function setupPayload(payload) {
     return {
-      id: action.id,
+      [ID]: action.id,
       type: action.type,
       payload: payload
     };

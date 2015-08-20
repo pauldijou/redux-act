@@ -1,6 +1,7 @@
 import chai from 'chai';
 import {createStore} from 'redux';
-import {createAction, createReducer} from '../src/index.js';
+import {createAction, createReducer} from '../src/index';
+import { ID } from '../src/constants';
 const expect = chai.expect;
 
 describe('createAction', function () {
@@ -14,8 +15,8 @@ describe('createAction', function () {
 
   function testAction(action, payload, description) {
     expect(action).to.be.an('object');
-    expect(action).to.have.all.keys('id', 'type', 'payload');
-    expect(action.id).to.be.a('number');
+    expect(action).to.have.all.keys(ID, 'type', 'payload');
+    expect(action[ID]).to.be.a('number');
     expect(action.type).to.be.a('string');
     expect(action.payload).to.deep.equal(payload);
     if (description !== undefined) {

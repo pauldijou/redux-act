@@ -1,6 +1,6 @@
 import chai from 'chai';
 import {createStore, combineReducers} from 'redux';
-import {createAction, createReducer} from '../src/index.js';
+import {createAction, createReducer} from '../src/index';
 const expect = chai.expect;
 
 describe('createReducer', function () {
