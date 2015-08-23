@@ -88,7 +88,7 @@ const append = createAction('optional description', (...args)=> args.join(''));
 // and it works fine with ES5! (maybe even ES3 \o/)
 const stringReducer = createReducer(function (on) {
   on(append, (state, payload)=> state += payload);
-  on(replace, (state, payload)=> state = payload);
+  on(replace, (state, payload)=> payload);
   // Warning! If you use the same action twice,
   // the second one will override the previous one.
 }, 'missing a lette'); // <-- Default state
@@ -126,7 +126,7 @@ const bestAction = createAction('Best. Action. Ever.', (text, checked)=> ({text,
 
 When calling an action creator, the returned object will have the following properties:
 
-- `id`: a generated id. Used by the reducers. Don't touch it.
+- `__id__`: a generated id. Used by the reducers. Don't touch it.
 - `type`: totally useless for you, but provide support for devtools.
 - `payload`: the data passed when calling the action creator. Will be the first argument of the function except if you specified a payload reducer when creating the action.
 
@@ -186,7 +186,7 @@ const reducerFactory = createReducer(function (on) {
 }, 0);
 ```
 
-Since an action is an object with some metadata (`id` and `type`) and a `payload` (which is your actual data), all reduce functions directly take the payload as their 2nd argument by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
+Since an action is an object with some metadata (`__id__` and `type`) and a `payload` (which is your actual data), all reduce functions directly take the payload as their 2nd argument by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
 
 ```javascript
 const add = createAction();
@@ -248,15 +248,15 @@ export const add = createAction('Add');
 export const sub = createAction('Sub');
 
 // reducer.js
-import * as actions from 'actions';
+import * as actions from './actions';
 export default createReducer({
   [actions.add]: (state, payload)=> state + payload,
   [actions.sub]: (state, payload)=> state - payload
 }, 0);
 
 // store.js
-import * as actions from 'actions';
-import reducer from 'reducer';
+import * as actions from './actions';
+import reducer from './reducer';
 
 const store = createStore(reducer);
 bindAll(actions, store);
