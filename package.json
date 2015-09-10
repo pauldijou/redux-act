@@ -23,7 +23,7 @@
     "mocha-better-spec-reporter": "^2.1.0",
     "babel": "^5.8.21",
     "babel-loader": "^5.1.4",
-    "redux": "1.0.0",
+    "redux": "^2.0.0",
     "rimraf": "^2.4.2",
     "isparta": "^3.0.3"
   },
