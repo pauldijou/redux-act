@@ -1,6 +1,6 @@
-import { ID } from './constants';
 
 let id = 0;
+let types = {};
 
 const identity = arg => arg;
 
@@ -14,16 +14,24 @@ export default function createAction(name, mapper = identity) {
     mapper = identity;
   }
 
+  if (name == null) {
+    name = (++id).toString();
+  }
+
+  if (types.hasOwnProperty(name)) {
+    throw new Error('Duplicate action type: ' + name);
+  }
+
+  types[name] = null;
+
   const action = {
-    id: ++id,
-    type: `[${id}]${name ? ' ' + name : ''}`
+    type: name
   };
 
   let actionStores = undefined;
 
   function setupPayload(payload) {
     return {
-      [ID]: action.id,
       type: action.type,
       payload: payload
     };
@@ -41,7 +49,7 @@ export default function createAction(name, mapper = identity) {
     }
   }
 
-  actionCreator.toString = ()=> action.id;
+  actionCreator.toString = ()=> action.type;
 
   actionCreator.bindTo = (stores)=> {
     actionStores = stores;

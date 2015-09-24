@@ -126,18 +126,17 @@ const bestAction = createAction('Best. Action. Ever.', (text, checked)=> ({text,
 
 When calling an action creator, the returned object will have the following properties:
 
-- `__id__`: a generated id. Used by the reducers. Don't touch it.
 - `type`: totally useless for you, but provide support for devtools.
 - `payload`: the data passed when calling the action creator. Will be the first argument of the function except if you specified a payload reducer when creating the action.
 
 ```javascript
 const addTodo = createAction('Add todo');
 addTodo('content');
-// return { __id__: 1, type: '[1] Add todo', payload: 'content' }
+// return { type: 'Add todo', payload: 'content' }
 
 const editTodo = createAction('Edit todo', (id, content)=> ({id, content}));
 editTodo(42, 'the answer');
-// return { __id__: 2, type: '[2] Edit todo', payload: {id: 42, content: 'the answer'} }
+// return { type: 'Edit todo', payload: {id: 42, content: 'the answer'} }
 ```
 
 Remember that you still need to dispatch those actions. If you already have one or more stores, you can bind the action to them so it will be automatically dispatched using the `bindTo` function. Notice that each call to `bindTo` will override any previous call.
@@ -186,7 +185,7 @@ const reducerFactory = createReducer(function (on) {
 }, 0);
 ```
 
-Since an action is an object with some metadata (`__id__` and `type`) and a `payload` (which is your actual data), all reduce functions directly take the payload as their 2nd argument by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
+Since an action is an object with some metadata (`type`) and a `payload` (which is your actual data), all reduce functions directly take the payload as their 2nd argument by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
 
 ```javascript
 const add = createAction();

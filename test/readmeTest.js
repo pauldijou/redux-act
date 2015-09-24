@@ -1,7 +1,6 @@
 import chai from 'chai';
 import {createStore, combineReducers} from 'redux';
 import {bindAll, createAction, createReducer} from '../src/index';
-import { ID } from '../src/constants';
 const expect = chai.expect;
 
 describe('README', function () {
@@ -73,17 +72,15 @@ describe('README', function () {
   it('should validate createAction API', function () {
     const addTodo = createAction('Add todo');
     addTodo('content');
-    // return { __id__: 1, type: '[1] Add todo', payload: 'content' }
+    // return { type: 'Add todo', payload: 'content' }
     const addTodoAction = addTodo('content');
-    expect(addTodoAction[ID]).to.be.a('number');
     expect(addTodoAction.type).to.be.a('string');
     expect(addTodoAction.payload).to.deep.equal('content');
 
     const editTodo = createAction('Edit todo', (id, content)=> ({id, content}));
     editTodo(42, 'the answer');
-    // return { __id__: 2, type: '[2] Edit todo', payload: {id: 42, content: 'the answer'} }
+    // return { type: 'Edit todo', payload: {id: 42, content: 'the answer'} }
     const editTodoAction = editTodo(42, 'the answer');
-    expect(editTodoAction[ID]).to.be.a('number');
     expect(editTodoAction.type).to.be.a('string');
     expect(editTodoAction.payload).to.deep.equal({id: 42, content: 'the answer'});
 

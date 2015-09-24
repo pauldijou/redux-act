@@ -1,5 +1,3 @@
-import { ID } from './constants';
-
 export default function createReducer(handlers = {}, defaultState) {
   let opts = {
     payload: true
@@ -24,8 +22,8 @@ export default function createReducer(handlers = {}, defaultState) {
   }
 
   function reduce(state = defaultState, action) {
-    if (action[ID] && handlers[action[ID]]) {
-      return handlers[action[ID]](state, opts.payload ? action.payload : action);
+    if (action.type && handlers[action.type]) {
+      return handlers[action.type](state, opts.payload ? action.payload : action);
     } else {
       return state;
     }
