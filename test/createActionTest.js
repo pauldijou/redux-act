@@ -1,7 +1,6 @@
 import chai from 'chai';
 import {createStore} from 'redux';
 import {createAction, createReducer} from '../src/index';
-import { ID } from '../src/constants';
 const expect = chai.expect;
 
 describe('createAction', function () {
@@ -15,12 +14,11 @@ describe('createAction', function () {
 
   function testAction(action, payload, description) {
     expect(action).to.be.an('object');
-    expect(action).to.have.all.keys(ID, 'type', 'payload');
-    expect(action[ID]).to.be.a('number');
+    expect(action).to.have.all.keys('type', 'payload');
     expect(action.type).to.be.a('string');
     expect(action.payload).to.deep.equal(payload);
     if (description !== undefined) {
-      expect(action.type).to.have.string(description);
+      expect(action.type).to.equal(description);
     }
   }
 
@@ -59,6 +57,19 @@ describe('createAction', function () {
   it('should return a valid action again', function () {
     const action = firstAction('a string');
     testAction(action, 'a string');
+  });
+
+  it('should create two empty action creator', function () {
+    const action1 = createAction();
+    const action2 = createAction();
+    expect(action1.toString()).to.not.equal(action2.toString())
+  });
+
+  it('should not create duplicate action creator', function () {
+    const action1 = createAction('the action');
+    expect(() => {
+      const action2 = createAction('the action');
+    }).to.throw('Duplicate action type: the action');
   });
 
   it('should create a second action creator', function () {
