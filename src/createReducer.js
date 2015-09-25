@@ -25,7 +25,11 @@ export default function createReducer(handlers = {}, defaultState) {
 
   function reduce(state = defaultState, action) {
     if (action[ID] && handlers[action[ID]]) {
-      return handlers[action[ID]](state, opts.payload ? action.payload : action);
+      if (opts.payload) {
+        return handlers[action[ID]](state, action.payload, action.meta);
+      } else {
+        return handlers[action[ID]](state, action);
+      }
     } else {
       return state;
     }

@@ -149,4 +149,16 @@ describe('createReducer', function () {
     add(1);
     expect(store.getState()).to.equal(42);
   });
+
+  it('should support meta', function () {
+    const add = createAction(undefined, undefined, arg=> arg * 2);
+    const reducer = createReducer({
+      [add]: (state, payload, meta)=> state + payload * meta
+    }, 0);
+    const store = createStore(reducer);
+    add.bindTo(store);
+    add(3);
+    expect(store.getState()).to.equal(18);
+  });
+
 });

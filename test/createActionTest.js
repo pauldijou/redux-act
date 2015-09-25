@@ -13,14 +13,17 @@ describe('createAction', function () {
     expect(actionCreator.bindTo).to.be.a('function');
   }
 
-  function testAction(action, payload, description) {
+  function testAction(action, payload, description, meta) {
     expect(action).to.be.an('object');
-    expect(action).to.have.all.keys(ID, 'type', 'payload');
+    expect(action).to.contain.keys(ID, 'type', 'payload');
     expect(action[ID]).to.be.a('number');
     expect(action.type).to.be.a('string');
     expect(action.payload).to.deep.equal(payload);
-    if (description !== undefined) {
+    if (typeof description !== 'undefined') {
       expect(action.type).to.have.string(description);
+    }
+    if (typeof meta !== 'undefined') {
+      expect(action.meta).to.deep.equal(meta);
     }
   }
 
@@ -29,21 +32,29 @@ describe('createAction', function () {
     const description = createAction('awesome description');
     const args = createAction((num, text)=> ({one: num, text}));
     const both = createAction('description', (id, content)=> ({id, content}));
+    const argsWithMeta = createAction((num, text)=> ({one: num, text}), (num, text) => ({more: num + 1}));
+    const bothWithMeta = createAction('description meta', (id, content)=> ({id, content}), (id, content) => ({more: true}));
 
     testActionCreator(simple);
     testActionCreator(description);
     testActionCreator(args);
     testActionCreator(both);
+    testActionCreator(argsWithMeta);
+    testActionCreator(bothWithMeta);
 
     const simpleAction = simple(1);
     const descriptionAction = description(true);
     const argsAction = args(4, 'hello');
     const bothAction = both(2, 'world');
+    const argsWithMetaAction = argsWithMeta(4, 'hello');
+    const bothWithMetaAction = bothWithMeta(2, 'world');
 
     testAction(simpleAction, 1);
     testAction(descriptionAction, true, 'awesome description');
     testAction(argsAction, {one: 4, text: 'hello'});
     testAction(bothAction, {id: 2, content: 'world'}, 'description');
+    testAction(argsWithMetaAction, {one: 4, text: 'hello'}, undefined, {more: 5});
+    testAction(bothWithMetaAction, {id: 2, content: 'world'}, 'description meta', {more: true});
   });
 
   it('should create one action creator', function () {
