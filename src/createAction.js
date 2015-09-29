@@ -4,6 +4,8 @@ let id = 0;
 
 const identity = arg => arg;
 
+const undef = () => undefined;
+
 export default function createAction(name, payloadCreator = identity, metaCreator) {
   if (typeof name === 'function') {
     metaCreator = payloadCreator;
@@ -15,6 +17,10 @@ export default function createAction(name, payloadCreator = identity, metaCreato
     payloadCreator = identity;
   }
 
+  if (typeof metaCreator !== 'function') {
+    metaCreator = undef;
+  }
+
   const action = {
     id: ++id,
     type: `[${id}]${name ? ' ' + name : ''}`
@@ -22,20 +28,13 @@ export default function createAction(name, payloadCreator = identity, metaCreato
 
   let actionStores = undefined;
 
-  function setupPayload(args) {
-    const result = {
+  function actionCreator(...args) {
+    const payloaded = {
       [ID]: action.id,
       type: action.type,
-      payload: payloadCreator(...args)
+      payload: payloadCreator(...args),
+      meta: metaCreator(...args)
     };
-    if (typeof metaCreator === 'function') {
-      result.meta = metaCreator(...args);
-    }
-    return result;
-  }
-
-  function actionCreator(...args) {
-    const payloaded = setupPayload(args);
 
     if (Array.isArray(actionStores)) {
       return actionStores.map(store=> store.dispatch(payloaded));

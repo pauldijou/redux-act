@@ -32,8 +32,8 @@ describe('createAction', function () {
     const description = createAction('awesome description');
     const args = createAction((num, text)=> ({one: num, text}));
     const both = createAction('description', (id, content)=> ({id, content}));
-    const argsWithMeta = createAction((num, text)=> ({one: num, text}), (num, text) => ({more: num + 1}));
-    const bothWithMeta = createAction('description meta', (id, content)=> ({id, content}), (id, content) => ({more: true}));
+    const argsWithMeta = createAction((num, text)=> ({one: num, text}), (num, text) => ({more: num + 1, append: text + ' world'}));
+    const bothWithMeta = createAction('description meta', (id, content)=> ({id, content}), (id, content) => ({more: true, prepend: 'hello ' + content}));
 
     testActionCreator(simple);
     testActionCreator(description);
@@ -53,8 +53,8 @@ describe('createAction', function () {
     testAction(descriptionAction, true, 'awesome description');
     testAction(argsAction, {one: 4, text: 'hello'});
     testAction(bothAction, {id: 2, content: 'world'}, 'description');
-    testAction(argsWithMetaAction, {one: 4, text: 'hello'}, undefined, {more: 5});
-    testAction(bothWithMetaAction, {id: 2, content: 'world'}, 'description meta', {more: true});
+    testAction(argsWithMetaAction, {one: 4, text: 'hello'}, undefined, {more: 5, append: 'hello world'});
+    testAction(bothWithMetaAction, {id: 2, content: 'world'}, 'description meta', {more: true, prepend: 'hello world'});
   });
 
   it('should create one action creator', function () {
