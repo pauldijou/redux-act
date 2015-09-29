@@ -6,19 +6,19 @@ const identity = arg => arg;
 
 const undef = () => undefined;
 
-export default function createAction(name, payloadCreator = identity, metaCreator) {
+export default function createAction(name, payloadReducer, metaReducer) {
   if (typeof name === 'function') {
-    metaCreator = payloadCreator;
-    payloadCreator = name;
+    metaReducer = payloadReducer;
+    payloadReducer = name;
     name = undefined;
   }
 
-  if (typeof payloadCreator !== 'function') {
-    payloadCreator = identity;
+  if (typeof payloadReducer !== 'function') {
+    payloadReducer = identity;
   }
 
-  if (typeof metaCreator !== 'function') {
-    metaCreator = undef;
+  if (typeof metaReducer !== 'function') {
+    metaReducer = undef;
   }
 
   const action = {
@@ -32,8 +32,8 @@ export default function createAction(name, payloadCreator = identity, metaCreato
     const payloaded = {
       [ID]: action.id,
       type: action.type,
-      payload: payloadCreator(...args),
-      meta: metaCreator(...args)
+      payload: payloadReducer(...args),
+      meta: metaReducer(...args)
     };
 
     if (Array.isArray(actionStores)) {

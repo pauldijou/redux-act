@@ -105,11 +105,28 @@ replace.bindTo(stringStore);
 append('r'); // stringStore.getState() === 'missing a letter'
 replace('a'); // stringStore.getState() === 'a'
 append('b', 'c', 'd'); // stringStore.getState() === 'abcd'
+
+// Little bonus, if you need to support metadata around your action,
+// like needed data but not really part of the payload, you add a second function
+const metaAction = createAction('desc', arg => arg, arg => {meta: 'so meta!'});
+
+// Metadata will be the third argument of the reduce function
+createReducer({
+  [metaAction]: (state, payload, meta)=> payload
+});
 ```
 
 ## API
 
-### createAction([description: String], [payload reducer: Function])
+### createAction([description], [payloadReducer], [metaReducer])
+
+#### Parameters
+
+- **description** (string, optional): used by logging and devtools when displaying the action.
+- **payloadReducer** (function, optional): transform multiple arguments as a unique payload.
+- **metaReducer** (function, optional): transform multiple arguments as a unique metadata object.
+
+#### Usage
 
 Create a new action creator. If you specify a description, it will be used by devtools. By default, `createAction` will return a function and its first argument will be used as the payload when dispatching the action. If you need to support multiple arguments, you need to specify a **payload reducer** in order to merge all arguments into one unique payload.
 
@@ -129,6 +146,7 @@ When calling an action creator, the returned object will have the following prop
 - `__id__`: a generated id. Used by the reducers. Don't touch it.
 - `type`: totally useless for you, but provide support for devtools.
 - `payload`: the data passed when calling the action creator. Will be the first argument of the function except if you specified a payload reducer when creating the action.
+- `meta`: if you have provided a **metaReducer**, it will be used to create a metadata object assigned to this key. Otherwise, it's `undefined`.
 
 ```javascript
 const addTodo = createAction('Add todo');
@@ -163,7 +181,14 @@ action();
 // store2.getState() === -2
 ```
 
-### createReducer(handlers: Object | Function, [default state: Any])
+### createReducer(handlers, [defaultState])
+
+#### Parameters
+
+- **handlers** (object or function): if `object`, a map of action to the reduce function. If `function`, take one attribute which is a function to register actions. See below.
+- **defaultState** (anything, optional): the initial state of the reducer. Must not be empty if you plan to use this reducer inside a `combineReducers`.
+
+#### Usage
 
 It's kind of the same syntax as the `Array.prototype.reduce` function. You can specify how to reduce as the first argument and the accumulator, or default state, as the second one. The default state is optional since you can retrieve it from the store when creating it but you should consider always having a default state inside a reducer, especially if you want to use it with `combineReducers` which make such default state mandatory.
 
@@ -238,7 +263,14 @@ increment(); // store.getState() === 2
 increment(); // store.getState() === 2
 ```
 
-### bindAll(actionCreators: Object | Array, stores: Object | Array)
+### bindAll(actionCreators, stores)
+
+#### Parameters
+
+- **actionCreators** (object or array): which action creator(s) to bind. Can be only one or several inside an array.
+- **stores** (object or array): the target store(s) when dispatching actions. Can be only one or several inside an array.
+
+#### Usage
 
 A common pattern is to export a set of action creators as an object. If you want to bind all of them to a store, there is this super small helper. You can also use an array of action creators. And since you can bind to one or several stores, you can specify either one store or an array of stores.
 
