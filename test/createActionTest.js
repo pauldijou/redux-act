@@ -102,6 +102,13 @@ describe('createAction', function () {
     testAction(action, 'a string');
   });
 
+  it('should not create duplicate serializable action creators', function () {
+    const action1 = createAction('THE_ACTION');
+    expect(() => {
+      const action2 = createAction('THE_ACTION');
+    }).to.throw('Duplicate action type: THE_ACTION');
+  });
+
   it('should create a second action creator', function () {
     secondAction = createAction('second action', (one, two, three)=> ({one, two, three: three.join(', ')}));
     testActionCreator(secondAction);
