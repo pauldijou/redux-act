@@ -2,15 +2,17 @@ import { ID } from './constants';
 
 let id = 0;
 
+const types = {}
+
 const identity = arg => arg;
 
 const undef = () => undefined;
 
-export default function createAction(name, payloadReducer, metaReducer) {
-  if (typeof name === 'function') {
+export default function createAction(description, payloadReducer, metaReducer) {
+  if (typeof description === 'function') {
     metaReducer = payloadReducer;
-    payloadReducer = name;
-    name = undefined;
+    payloadReducer = description;
+    description = undefined;
   }
 
   if (typeof payloadReducer !== 'function') {
@@ -21,9 +23,19 @@ export default function createAction(name, payloadReducer, metaReducer) {
     metaReducer = undef;
   }
 
+  const isSerializable = (typeof description === 'string') && /^[A-Z_]+$/.test(description);
+
+  if (isSerializable) {
+    if (types[description]) {
+      throw new TypeError(`Duplicate action type: ${description}`);
+    }
+
+    types[description] = true;
+  }
+
   const action = {
-    id: ++id,
-    type: `[${id}]${name ? ' ' + name : ''}`
+    id: isSerializable ? description : ++id,
+    type: isSerializable ? description : `[${id}]${description ? ' ' + description : ''}`
   };
 
   let actionStores = undefined;

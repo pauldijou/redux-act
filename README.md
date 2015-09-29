@@ -106,6 +106,12 @@ append('r'); // stringStore.getState() === 'missing a letter'
 replace('a'); // stringStore.getState() === 'a'
 append('b', 'c', 'd'); // stringStore.getState() === 'abcd'
 
+// If you really need serializable actions, using string constant rather
+// than runtime generated id, just use a uppercase description (with eventually some underscores)
+// and it will be use as the id of the action
+const doSomething = createAction('STRING_CONSTANT');
+doSomething(1); // {__id__: 'STRING_CONSTANT', type: 'STRING_CONSTANT', payload: 1}
+
 // Little bonus, if you need to support metadata around your action,
 // like needed data but not really part of the payload, you add a second function
 const metaAction = createAction('desc', arg => arg, arg => {meta: 'so meta!'});
@@ -122,7 +128,7 @@ createReducer({
 
 #### Parameters
 
-- **description** (string, optional): used by logging and devtools when displaying the action.
+- **description** (string, optional): used by logging and devtools when displaying the action. If this parameter is uppercase only, with underscores, it will used as the id and type of the action rather than the generated id. You can use this feature to have serializable actions you can share between client and server.
 - **payloadReducer** (function, optional): transform multiple arguments as a unique payload.
 - **metaReducer** (function, optional): transform multiple arguments as a unique metadata object.
 
@@ -139,6 +145,8 @@ const betterAction = createAction('This is better!');
 const multipleAction = createAction((text, checked)=> ({text, checked}))
 // Again, better to add a description
 const bestAction = createAction('Best. Action. Ever.', (text, checked)=> ({text, checked}))
+// Serializable action
+const serializableAction = createAction('SERIALIZABLE_ACTION');
 ```
 
 When calling an action creator, the returned object will have the following properties:
@@ -156,6 +164,10 @@ addTodo('content');
 const editTodo = createAction('Edit todo', (id, content)=> ({id, content}));
 editTodo(42, 'the answer');
 // return { __id__: 2, type: '[2] Edit todo', payload: {id: 42, content: 'the answer'} }
+
+const serializeTodo = createAction('SERIALIZE_TODO');
+serializeTodo(1);
+// return { __id__: 'SERIALIZE_TODO', type: 'SERIALIZE_TODO', payload: 1 }
 ```
 
 Remember that you still need to dispatch those actions. If you already have one or more stores, you can bind the action to them so it will be automatically dispatched using the `bindTo` function. Notice that each call to `bindTo` will override any previous call.

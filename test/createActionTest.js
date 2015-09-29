@@ -15,13 +15,21 @@ describe('createAction', function () {
 
   function testAction(action, payload, description, meta) {
     expect(action).to.be.an('object');
-    expect(action).to.contain.keys(ID, 'type', 'payload');
+    expect(action).to.contain.keys(ID, 'type', 'payload', 'meta');
     expect(action[ID]).to.be.a('number');
     expect(action.type).to.be.a('string');
     expect(action.payload).to.deep.equal(payload);
-    if (typeof description !== 'undefined') {
-      expect(action.type).to.have.string(description);
+    if (typeof meta !== 'undefined') {
+      expect(action.meta).to.deep.equal(meta);
     }
+  }
+
+  function testSerializableAction(action, description, payload, meta) {
+    expect(action).to.be.an('object');
+    expect(action).to.contain.keys(ID, 'type', 'payload', 'meta');
+    expect(action[ID]).to.equal(description);
+    expect(action.type).to.equal(description);
+    expect(action.payload).to.deep.equal(payload);
     if (typeof meta !== 'undefined') {
       expect(action.meta).to.deep.equal(meta);
     }
@@ -55,6 +63,28 @@ describe('createAction', function () {
     testAction(bothAction, {id: 2, content: 'world'}, 'description');
     testAction(argsWithMetaAction, {one: 4, text: 'hello'}, undefined, {more: 5, append: 'hello world'});
     testAction(bothWithMetaAction, {id: 2, content: 'world'}, 'description meta', {more: true, prepend: 'hello world'});
+  });
+
+  it('should support all format with serializable syntax', function () {
+    const description = createAction('DESCRIPTION_ACTION');
+    const args = createAction('ARGS_ACTION', (num, text)=> ({one: num, text}));
+    const both = createAction('BOTH_ACTION', (id, content)=> ({id, content}));
+    const meta = createAction('META_ACTION', (id, content)=> ({id, content}), (id, content) => ({more: true, prepend: 'hello ' + content}));
+
+    testActionCreator(description);
+    testActionCreator(args);
+    testActionCreator(both);
+    testActionCreator(meta);
+
+    const descriptionAction = description(true);
+    const argsAction = args(4, 'hello');
+    const bothAction = both(2, 'world');
+    const metaAction = meta(2, 'world');
+
+    testSerializableAction(descriptionAction, 'DESCRIPTION_ACTION', true);
+    testSerializableAction(argsAction, 'ARGS_ACTION', {one: 4, text: 'hello'});
+    testSerializableAction(bothAction, 'BOTH_ACTION', {id: 2, content: 'world'});
+    testSerializableAction(metaAction, 'META_ACTION', {id: 2, content: 'world'}, {more: true, prepend: 'hello world'});
   });
 
   it('should create one action creator', function () {

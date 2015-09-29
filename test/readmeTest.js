@@ -87,6 +87,14 @@ describe('README', function () {
     expect(editTodoAction.type).to.be.a('string');
     expect(editTodoAction.payload).to.deep.equal({id: 42, content: 'the answer'});
 
+    const serializeTodo = createAction('SERIALIZE_TODO');
+    serializeTodo(1);
+    // return { __id__: 'SERIALIZE_TODO', type: 'SERIALIZE_TODO', payload: 1 }
+    const serializeTodoAction = serializeTodo(1);
+    expect(serializeTodoAction[ID]).to.equal('SERIALIZE_TODO');
+    expect(serializeTodoAction.type).to.equal('SERIALIZE_TODO');
+    expect(serializeTodoAction.payload).to.equal(1);
+
     const action = createAction();
     const reducer = createReducer({
       [action]: (state)=> state * 2
