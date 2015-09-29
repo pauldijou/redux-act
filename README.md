@@ -14,9 +14,9 @@ npm install redux-act --save
 - [FAQ](#faq)
 - [Avanced usage](#advanced-usage)
 - [API](#api)
-  - [createAction](#createactiondescription-string-payload-reducer-function)
-  - [createReducer](#createreducerhandlers-object--function-default-state-any)
-  - [bindAll](#bindallactioncreators-object--array-stores-object--array)
+  - [createAction](#createactiondescription-payloadreducer-metareducer)
+  - [createReducer](#createreducerhandlers-defaultstate)
+  - [bindAll](#bindallactioncreators-stores)
 
 ## Usage
 
