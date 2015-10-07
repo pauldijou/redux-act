@@ -1,5 +1,6 @@
 import chai from 'chai';
-import {createStore} from 'redux';
+import {createStore, applyMiddleware} from 'redux';
+import thunkMiddleware from 'redux-thunk';
 import {createAction, createReducer} from '../src/index';
 import { ID } from '../src/constants';
 const expect = chai.expect;
@@ -184,5 +185,90 @@ describe('createAction', function () {
     expect(store.getState()).to.equal(2);
     action();
     expect(store.getState()).to.equal(3);
+  });
+
+  it('should support fake async action', function (done) {
+    const start = createAction();
+    const success = createAction();
+
+    const reducer = createReducer({
+      [start]: (state)=> ({ ...state, running: true }),
+      [success]: (state, result)=> ({ running: false, result })
+    }, {
+      running: false,
+      result: false
+    });
+
+    const store = createStore(reducer);
+
+    start.bindTo(store);
+    success.bindTo(store);
+
+    function fetch() {
+      start();
+      setTimeout(()=> {
+        expect(store.getState().running).to.equal(true);
+        expect(store.getState().result).to.equal(false);
+        success(1);
+        expect(store.getState().running).to.equal(false);
+        expect(store.getState().result).to.equal(1);
+        done();
+      }, 5);
+    }
+
+    expect(store.getState().running).to.equal(false);
+    expect(store.getState().result).to.equal(false);
+    fetch();
+    expect(store.getState().running).to.equal(true);
+    expect(store.getState().result).to.equal(false);
+  });
+
+  it('should support async action', function (done) {
+    const start = createAction();
+    const success = createAction();
+
+    const reducer = createReducer({
+      [start]: (state)=> ({ ...state, running: true }),
+      [success]: (state, result)=> ({ running: false, result })
+    }, {
+      running: false,
+      result: false
+    });
+
+    const createStoreWithMiddleware = applyMiddleware(
+      thunkMiddleware
+    )(createStore);
+
+    const store = createStoreWithMiddleware(reducer);
+
+    start.bindTo(store);
+    success.bindTo(store);
+
+    function fetch() {
+      // We don't really need the dispatch
+      // but here it is if you don't bind your actions
+      return function (dispatch) {
+        start();
+        return new Promise(resolve => {
+          setTimeout(()=>
+            resolve(1)
+          , 5);
+        }).then(result=>
+          success(result)
+        );
+      };
+    }
+
+    expect(store.getState().running).to.equal(false);
+    expect(store.getState().result).to.equal(false);
+
+    store.dispatch(fetch()).then(()=> {
+      expect(store.getState().running).to.equal(false);
+      expect(store.getState().result).to.equal(1);
+      done();
+    });
+
+    expect(store.getState().running).to.equal(true);
+    expect(store.getState().result).to.equal(false);
   });
 });

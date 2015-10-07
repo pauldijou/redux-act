@@ -17,6 +17,8 @@ npm install redux-act --save
   - [createAction](#createactiondescription-payloadreducer-metareducer)
   - [createReducer](#createreducerhandlers-defaultstate)
   - [bindAll](#bindallactioncreators-stores)
+- [Cookbook](#cookbook)
+  - [Async actions](#async-actions)
 
 ## Usage
 
@@ -306,6 +308,60 @@ const store = createStore(reducer);
 bindAll(actions, store);
 
 export default store;
+```
+
+## Cookbook
+
+### Async actions
+
+```javascript
+import {createStore, applyMiddleware} from 'redux';
+import thunkMiddleware from 'redux-thunk';
+import {createAction, createReducer} from '../src/index';
+
+const start = createAction();
+const success = createAction();
+
+const reducer = createReducer({
+  [start]: (state)=> ({ ...state, running: true }),
+  [success]: (state, result)=> ({ running: false, result })
+}, {
+  running: false,
+  result: false
+});
+
+const createStoreWithMiddleware = applyMiddleware(
+  thunkMiddleware
+)(createStore);
+
+const store = createStoreWithMiddleware(reducer);
+
+start.bindTo(store);
+success.bindTo(store);
+
+function fetch() {
+  // We don't really need the dispatch
+  // but here it is if you don't bind your actions
+  return function (dispatch) {
+    // state: { running: false, result: false }
+    start();
+    // state: { running: true, result: false }
+    return new Promise(resolve => {
+      // Here, you should probably do a real async call,
+      // like, you know, XMLHttpRequest or Global.fetch stuff
+      setTimeout(()=>
+        resolve(1)
+      , 5);
+    }).then(result=>
+      success(result)
+      // state: { running: false, result: 1 }
+    );
+  };
+}
+
+store.dispatch(fetch()).then(()=> {
+  // state: { running: false, result: 1 }
+});
 ```
 
 ## Thanks
