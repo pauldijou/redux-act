@@ -330,21 +330,20 @@ const reducer = createReducer({
   result: false
 });
 
+// 1) You can use the same way as the Redux samples
+// using thunk middleware
 const createStoreWithMiddleware = applyMiddleware(
   thunkMiddleware
 )(createStore);
 
 const store = createStoreWithMiddleware(reducer);
 
-start.bindTo(store);
-success.bindTo(store);
-
 function fetch() {
   // We don't really need the dispatch
   // but here it is if you don't bind your actions
   return function (dispatch) {
     // state: { running: false, result: false }
-    start();
+    dispatch(start());
     // state: { running: true, result: false }
     return new Promise(resolve => {
       // Here, you should probably do a real async call,
@@ -353,13 +352,40 @@ function fetch() {
         resolve(1)
       , 5);
     }).then(result=>
-      success(result)
+      dispatch(success(result))
       // state: { running: false, result: 1 }
     );
   };
 }
 
 store.dispatch(fetch()).then(()=> {
+  // state: { running: false, result: 1 }
+});
+
+// 2) You can enjoy the redux-act binding
+// and directly call the actions
+start.bindTo(store);
+success.bindTo(store);
+
+const store = createStore(reducer);
+
+function fetch() {
+  // state: { running: false, result: false }
+  start();
+  // state: { running: true, result: false }
+  return new Promise(resolve => {
+    // Here, you should probably do a real async call,
+    // like, you know, XMLHttpRequest or Global.fetch stuff
+    setTimeout(()=>
+      resolve(1)
+    , 5);
+  }).then(result=>
+    success(result)
+    // state: { running: false, result: 1 }
+  );
+}
+
+fetch().then(()=> {
   // state: { running: false, result: 1 }
 });
 ```

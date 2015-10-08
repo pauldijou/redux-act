@@ -207,20 +207,20 @@ describe('createAction', function () {
     function fetch() {
       start();
       setTimeout(()=> {
-        expect(store.getState().running).to.equal(true);
-        expect(store.getState().result).to.equal(false);
+        expect(store.getState().running).to.be.true;
+        expect(store.getState().result).to.be.false;
         success(1);
-        expect(store.getState().running).to.equal(false);
+        expect(store.getState().running).to.be.false;
         expect(store.getState().result).to.equal(1);
         done();
       }, 5);
     }
 
-    expect(store.getState().running).to.equal(false);
-    expect(store.getState().result).to.equal(false);
+    expect(store.getState().running).to.be.false;
+    expect(store.getState().result).to.be.false;
     fetch();
-    expect(store.getState().running).to.equal(true);
-    expect(store.getState().result).to.equal(false);
+    expect(store.getState().running).to.be.true;
+    expect(store.getState().result).to.be.false;
   });
 
   it('should support async action', function (done) {
@@ -241,34 +241,72 @@ describe('createAction', function () {
 
     const store = createStoreWithMiddleware(reducer);
 
-    start.bindTo(store);
-    success.bindTo(store);
-
     function fetch() {
       // We don't really need the dispatch
       // but here it is if you don't bind your actions
       return function (dispatch) {
-        start();
+        dispatch(start());
         return new Promise(resolve => {
           setTimeout(()=>
             resolve(1)
           , 5);
         }).then(result=>
-          success(result)
+          dispatch(success(result))
         );
       };
     }
 
-    expect(store.getState().running).to.equal(false);
-    expect(store.getState().result).to.equal(false);
+    expect(store.getState().running).to.be.false;
+    expect(store.getState().result).to.be.false;
 
     store.dispatch(fetch()).then(()=> {
-      expect(store.getState().running).to.equal(false);
+      expect(store.getState().running).to.be.false;
       expect(store.getState().result).to.equal(1);
       done();
     });
 
-    expect(store.getState().running).to.equal(true);
-    expect(store.getState().result).to.equal(false);
+    expect(store.getState().running).to.be.true;
+    expect(store.getState().result).to.be.false;
+  });
+
+  it('should support async action without thunk', function (done) {
+    const start = createAction();
+    const success = createAction();
+
+    const reducer = createReducer({
+      [start]: (state)=> ({ ...state, running: true }),
+      [success]: (state, result)=> ({ running: false, result })
+    }, {
+      running: false,
+      result: false
+    });
+
+    const store = createStore(reducer);
+
+    start.bindTo(store);
+    success.bindTo(store);
+
+    function fetch() {
+      start();
+      return new Promise(resolve => {
+        setTimeout(()=>
+          resolve(1)
+        , 5);
+      }).then(result=>
+        success(result)
+      );
+    }
+
+    expect(store.getState().running).to.be.false;
+    expect(store.getState().result).to.be.false;
+
+    fetch().then(()=> {
+      expect(store.getState().running).to.be.false;
+      expect(store.getState().result).to.equal(1);
+      done();
+    });
+
+    expect(store.getState().running).to.be.true;
+    expect(store.getState().result).to.be.false;
   });
 });
