@@ -281,7 +281,7 @@ increment(); // store.getState() === 2
 
 #### Parameters
 
-- **actionCreators** (object or array): which action creator(s) to bind. Can be only one or several inside an array.
+- **actionCreators** (object or array): which action creators to bind. If it's an object, it's a map of name -> action creator, useful when importing several actions at once.
 - **stores** (object or array): the target store(s) when dispatching actions. Can be only one or several inside an array.
 
 #### Usage
@@ -364,10 +364,10 @@ store.dispatch(fetch()).then(()=> {
 
 // 2) You can enjoy the redux-act binding
 // and directly call the actions
+const store = createStore(reducer);
+
 start.bindTo(store);
 success.bindTo(store);
-
-const store = createStore(reducer);
 
 function fetch() {
   // state: { running: false, result: false }
