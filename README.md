@@ -317,7 +317,7 @@ export default store;
 ```javascript
 import {createStore, applyMiddleware} from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import {createAction, createReducer} from '../src/index';
+import {createAction, createReducer} from 'redux-act';
 
 const start = createAction();
 const success = createAction();
