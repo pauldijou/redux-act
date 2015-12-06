@@ -20,7 +20,7 @@ export default function createReducer(handlers = {}, defaultState) {
   if (typeof handlers === 'function') {
     const factory = handlers;
     handlers = {};
-    factory(on);
+    factory(on, off);
   }
 
   function reduce(state = defaultState, action) {

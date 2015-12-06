@@ -180,4 +180,34 @@ describe('README', function () {
     increment(); // store.getState() === 2
     expect(store.getState()).to.equal(2);
   });
+
+  it('should validate createReducer API 3', function () {
+    // Using the 'on' and 'off' functions of the function factory
+    // when creating the reducer
+    const increment = createAction();
+    const reducer = createReducer(function (on, off) {
+      on(increment, state => {
+        // Just for fun, we will disable increment when reaching 2
+        // (but we will still increment one last time)
+        if (state === 2) {
+          off(increment);
+        }
+        return state + 1;
+      });
+    }, 0);
+
+    const store = createStore(reducer);
+    increment.bindTo(store);
+
+    increment(); // store.getState() === 1
+    expect(store.getState()).to.equal(1);
+    increment(); // store.getState() === 2
+    expect(store.getState()).to.equal(2);
+    increment(); // store.getState() === 3
+    expect(store.getState()).to.equal(3);
+    increment(); // store.getState() === 3
+    expect(store.getState()).to.equal(3);
+    increment(); // store.getState() === 3
+    expect(store.getState()).to.equal(3);
+  });
 });

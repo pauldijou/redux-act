@@ -4,7 +4,7 @@ import {createAction, createReducer} from '../src/index';
 const expect = chai.expect;
 
 describe('createReducer', function () {
-  let increment, decrement, add, sub, firstReducer, secondReducer;
+  let increment, decrement, add, sub, firstReducer, secondReducer, funkyReducer;
 
   it('should init', function () {
     increment = createAction();
@@ -21,6 +21,20 @@ describe('createReducer', function () {
       on(decrement, (state)=> state - 1);
       on(sub, (state, payload)=> state - payload);
     }, 42);
+
+    funkyReducer = createReducer(function (on, off) {
+      on(increment, state => {
+        off(add);
+        on(sub, (state, payload)=> state - payload);
+        return state + 1;
+      });
+
+      on(decrement, state => {
+        off(sub);
+        on(add, (state, payload)=> state + payload);
+        return state - 1;
+      });
+    }, 0);
   });
 
   it('should be a valid first reducer', function () {
@@ -159,6 +173,38 @@ describe('createReducer', function () {
     add.bindTo(store);
     add(3);
     expect(store.getState()).to.equal(18);
+  });
+
+  it('should support on and off inside factory function', function () {
+    const store = createStore(funkyReducer);
+    increment.bindTo(store);
+    decrement.bindTo(store);
+    add.bindTo(store);
+    sub.bindTo(store);
+
+    // No add nor sub support at start
+    add(5);
+    expect(store.getState()).to.equal(0);
+    sub(6);
+    expect(store.getState()).to.equal(0);
+
+    // increment => sub support
+    increment();
+    expect(store.getState()).to.equal(1);
+    increment();
+    expect(store.getState()).to.equal(2);
+    sub(5);
+    expect(store.getState()).to.equal(-3);
+    add(3);
+    expect(store.getState()).to.equal(-3);
+
+    // decrement => add support
+    decrement();
+    expect(store.getState()).to.equal(-4);
+    sub(10);
+    expect(store.getState()).to.equal(-4);
+    add(6);
+    expect(store.getState()).to.equal(2);
   });
 
 });

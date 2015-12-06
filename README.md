@@ -199,7 +199,7 @@ action();
 
 #### Parameters
 
-- **handlers** (object or function): if `object`, a map of action to the reduce function. If `function`, take one attribute which is a function to register actions. See below.
+- **handlers** (object or function): if `object`, a map of action to the reduce function. If `function`, take two attributes: a function to register actions and another one to unregister them. See below.
 - **defaultState** (anything, optional): the initial state of the reducer. Must not be empty if you plan to use this reducer inside a `combineReducers`.
 
 #### Usage
@@ -219,9 +219,10 @@ const reducerMap = createReducer({
 }, 0);
 
 // Second pattern
-const reducerFactory = createReducer(function (on) {
+const reducerFactory = createReducer(function (on, off) {
   on(increment, (state)=> state + 1);
   on(add, (state, payload)=> state + payload);
+  // See pro tip below for "off" usage
 }, 0);
 ```
 
@@ -240,7 +241,7 @@ reducer.options({
 });
 ```
 
-**Pro Tip** You can dynamically add and remove actions. There are two patterns to do so.
+**Pro Tip** You can dynamically add and remove actions. There are multiple patterns to do so.
 
 ```javascript
 // Adding and deleting properties from the handlers object
@@ -275,6 +276,29 @@ reducer.off(increment);
 
 increment(); // store.getState() === 2
 increment(); // store.getState() === 2
+
+// Using the 'on' and 'off' functions of the function factory
+// when creating the reducer
+const increment = createAction();
+const reducer = createReducer(function (on, off) {
+  on(increment, state => {
+    // Just for fun, we will disable increment when reaching 2
+    // (but we will still increment one last time)
+    if (state === 2) {
+      off(increment);
+    }
+    return state + 1;
+  });
+}, 0);
+
+const store = createStore(reducer);
+increment.bindTo(store);
+
+increment(); // store.getState() === 1
+increment(); // store.getState() === 2
+increment(); // store.getState() === 3
+increment(); // store.getState() === 3
+increment(); // store.getState() === 3
 ```
 
 ### bindAll(actionCreators, stores)
