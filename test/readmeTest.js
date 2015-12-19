@@ -1,6 +1,6 @@
 import chai from 'chai';
 import {createStore, combineReducers} from 'redux';
-import {bindAll, createAction, createReducer} from '../src/index';
+import {assignAll, createAction, createReducer} from '../src/index';
 import { ID } from '../src/constants';
 const expect = chai.expect;
 
@@ -58,8 +58,8 @@ describe('README', function () {
     // rather than binding them in each component, you can do it
     // once you've created both the store and your actions
     const stringStore = createStore(stringReducer);
-    append.bindTo(stringStore);
-    replace.bindTo(stringStore);
+    append.assignTo(stringStore);
+    replace.assignTo(stringStore);
 
     // Now, when calling actions, they will be automatically dispatched
     append('r'); // stringStore.getState() === 'missing a letter'
@@ -103,7 +103,7 @@ describe('README', function () {
     const store2 = createStore(reducer, -1);
 
     // Automatically dispatch the action to the store when called
-    action.bindTo(store);
+    action.assignTo(store);
     action(); // store.getState() === 2
     expect(store.getState()).to.equal(2);
     action(); // store.getState() === 4
@@ -112,7 +112,7 @@ describe('README', function () {
     expect(store.getState()).to.equal(8);
 
     // You can bind the action to several stores using an array
-    action.bindTo([store, store2]);
+    action.assignTo([store, store2]);
     action();
     // store.getState() === 16
     // store2.getState() === -2
@@ -142,7 +142,7 @@ describe('README', function () {
     const reducer = createReducer(handlers, 0);
     const store = createStore(reducer);
 
-    const increment = createAction().bindTo(store);
+    const increment = createAction().assignTo(store);
     handlers[increment] = (state)=> state + 1;
 
     increment(); // store.getState() === 1
@@ -164,7 +164,7 @@ describe('README', function () {
     // you used to create the reducer
     const reducer = createReducer({}, 0);
     const store = createStore(reducer);
-    const increment = createAction().bindTo(store);
+    const increment = createAction().assignTo(store);
 
     reducer.on(increment, (state)=> state + 1);
 
@@ -197,7 +197,7 @@ describe('README', function () {
     }, 0);
 
     const store = createStore(reducer);
-    increment.bindTo(store);
+    increment.assignTo(store);
 
     increment(); // store.getState() === 1
     expect(store.getState()).to.equal(1);

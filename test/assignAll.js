@@ -1,9 +1,9 @@
 import chai from 'chai';
 import {createStore} from 'redux';
-import {bindAll, createAction, createReducer} from '../src/index.js';
+import {assignAll, createAction, createReducer} from '../src/index.js';
 const expect = chai.expect;
 
-describe('bindAll', function () {
+describe('assignAll', function () {
   function init() {
     const inc = createAction();
     const dec = createAction();
@@ -18,7 +18,7 @@ describe('bindAll', function () {
 
   it('should support hash', function () {
     const { inc, dec, reducer, store, store2 } = init();
-    bindAll({ inc, dec }, store);
+    assignAll({ inc, dec }, store);
     inc();
     expect(store.getState()).to.equal(1);
     inc();
@@ -29,7 +29,7 @@ describe('bindAll', function () {
 
   it('should support array', function () {
     const { inc, dec, reducer, store, store2 } = init();
-    bindAll([inc, dec], store);
+    assignAll([inc, dec], store);
     inc();
     expect(store.getState()).to.equal(1);
     inc();
@@ -40,7 +40,7 @@ describe('bindAll', function () {
 
   it('should support hash and multiple stores', function () {
     const { inc, dec, reducer, store, store2 } = init();
-    bindAll({ inc, dec }, [store, store2]);
+    assignAll({ inc, dec }, [store, store2]);
     inc();
     expect(store.getState()).to.equal(1);
     expect(store2.getState()).to.equal(1);
@@ -54,7 +54,7 @@ describe('bindAll', function () {
 
   it('should support array and multiple stores', function () {
     const { inc, dec, reducer, store, store2 } = init();
-    bindAll([inc, dec], [store, store2]);
+    assignAll([inc, dec], [store, store2]);
     inc();
     expect(store.getState()).to.equal(1);
     expect(store2.getState()).to.equal(1);

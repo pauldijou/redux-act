@@ -93,7 +93,7 @@ describe('createReducer', function () {
     const handlers = {};
     const reducer = createReducer(handlers, 0);
     const store = createStore(reducer);
-    const inc = createAction().bindTo(store);
+    const inc = createAction().assignTo(store);
     handlers[inc] = (state)=> state + 1;
 
     inc();
@@ -114,7 +114,7 @@ describe('createReducer', function () {
   it('should support on and off methods', function () {
     const reducer = createReducer({}, 0);
     const store = createStore(reducer);
-    const inc = createAction().bindTo(store)
+    const inc = createAction().assignTo(store)
 
     reducer.on(inc, state=> state + 1)
 
@@ -140,7 +140,7 @@ describe('createReducer', function () {
     }, 0);
     reducer.options({payload: false});
     const store = createStore(reducer);
-    add.bindTo(store);
+    add.assignTo(store);
 
     add(3);
     expect(store.getState()).to.equal(3);
@@ -170,17 +170,17 @@ describe('createReducer', function () {
       [add]: (state, payload, meta)=> state + payload * meta
     }, 0);
     const store = createStore(reducer);
-    add.bindTo(store);
+    add.assignTo(store);
     add(3);
     expect(store.getState()).to.equal(18);
   });
 
   it('should support on and off inside factory function', function () {
     const store = createStore(funkyReducer);
-    increment.bindTo(store);
-    decrement.bindTo(store);
-    add.bindTo(store);
-    sub.bindTo(store);
+    increment.assignTo(store);
+    decrement.assignTo(store);
+    add.assignTo(store);
+    sub.assignTo(store);
 
     // No add nor sub support at start
     add(5);

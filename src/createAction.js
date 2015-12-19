@@ -4,9 +4,25 @@ let id = 0;
 
 const types = {}
 
-const identity = arg => arg;
+const identity = (arg) => arg;
 
 const undef = () => undefined;
+
+const normalize = (dispatchOrStore) => {
+  if (dispatchOrStore && typeof dispatchOrStore.dispatch === 'function') {
+    return dispatchOrStore.dispatch;
+  } else {
+    return dispatchOrStore;
+  }
+}
+
+const normalizeAll = (dispatchOrStores) => {
+  if (Array.isArray(dispatchOrStores)) {
+    return dispatchOrStores.map(normalize);
+  } else {
+    return normalize(dispatchOrStores);
+  }
+}
 
 export default function createAction(description, payloadReducer, metaReducer) {
   if (typeof description === 'function') {
@@ -38,30 +54,44 @@ export default function createAction(description, payloadReducer, metaReducer) {
     type: isSerializable ? description : `[${id}]${description ? ' ' + description : ''}`
   };
 
-  let actionStores = undefined;
+  let dispatchFunctions = undefined;
 
-  function actionCreator(...args) {
-    const payloaded = {
+  function makeAction(...args) {
+    return {
       [ID]: action.id,
       type: action.type,
       payload: payloadReducer(...args),
       meta: metaReducer(...args)
     };
+  }
 
-    if (Array.isArray(actionStores)) {
-      return actionStores.map(store=> store.dispatch(payloaded));
-    } else if (actionStores) {
-      return actionStores.dispatch(payloaded);
+  const makeAndDispatch = (dispatchs) => (...args) => {
+    if (Array.isArray(dispatchs)) {
+      const payloadedAction = makeAction(...args);
+      return dispatchs.map(dispatch => dispatch(payloadedAction));
+    } else if (dispatchs) {
+      return dispatchs(makeAction(...args));
     } else {
-      return payloaded;
+      return makeAction(...args);
     }
   }
 
-  actionCreator.toString = ()=> action.id;
+  function actionCreator(...args) {
+    return makeAndDispatch(dispatchFunctions)(...args);
+  }
 
-  actionCreator.bindTo = (stores)=> {
-    actionStores = stores;
+  actionCreator.toString = () => action.id;
+
+  actionCreator.assignTo = (dispatchOrStores)=> {
+    dispatchFunctions = normalizeAll(dispatchOrStores);
     return actionCreator;
+  };
+
+  actionCreator.bindTo = (dispatchOrStores) => {
+    const bindedActionCreator = makeAndDispatch(normalizeAll(dispatchOrStores));
+    bindedActionCreator.toString = actionCreator.toString;
+    bindedActionCreator.bindTo = () => bindedActionCreator;
+    return bindedActionCreator;
   };
 
   return actionCreator;

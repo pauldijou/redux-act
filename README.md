@@ -16,7 +16,7 @@ npm install redux-act --save
 - [API](#api)
   - [createAction](#createactiondescription-payloadreducer-metareducer)
   - [createReducer](#createreducerhandlers-defaultstate)
-  - [bindAll](#bindallactioncreators-stores)
+  - [assignAll](#assignAllactioncreators-stores)
 - [Cookbook](#cookbook)
   - [Async actions](#async-actions)
 
@@ -31,16 +31,15 @@ import { createAction, createReducer } from 'redux-act';
 
 // Create an action creator (description is optional)
 const add = createAction('add some stuff');
-
-// You can create several action creators at once
-const [increment, decrement] = ['inc', 'dec'].map(createAction);
+const inc = createAction('increment the state');
+const dec = createAction('decrement the state');
 
 // Create a reducer
 // (ES6 syntax, see Advanced usage below for an alternative for ES5)
 const counterReducer = createReducer({
-  [increment]: (state)=> state + 1,
-  [decrement]: (state)=> state - 1,
-  [add]: (state, payload)=> state + payload
+  [increment]: (state) => state + 1,
+  [decrement]: (state) => state - 1,
+  [add]: (state, payload) => state + payload
 }, 0); // <-- This is the default state
 
 // Create the store
@@ -65,7 +64,7 @@ counterStore.dispatch(add(5)); // counterStore.getState() === 6
 
 - **Why having two syntax to create reducers?** The one with only a map of `action => reduce function` doesn't allow much. This is why the other one is here, in case you would need a small state inside the reducer, having something similar as an actor, or whatever you feel like. Also, one of the syntax is ES6 only.
 
-- **Inside a reducer, why is it `(state, payload)=> newState` rather than `(state, action)=> newState`?** You can find more info about that on the `createReducer` API below, but basically, that's because an action is composed of metadata handled by the lib and your payload. Since you only care about that part, better to have it directly. You can switch back to the full action if necessary of course.
+- **Inside a reducer, why is it `(state, payload) => newState` rather than `(state, action) => newState`?** You can find more info about that on the `createReducer` API below, but basically, that's because an action is composed of metadata handled by the lib and your payload. Since you only care about that part, better to have it directly. You can switch back to the full action if necessary of course.
 
 - **Why have you done that? Aren't string constants good enough?** I know that the Redux doc states that such magic isn't really good, that saving a few lines of code isn't worth hiding such logic. I can understand that. And don't get me wrong, the main goal of this lib isn't to reduce boilerplate (even if I like that it does) but to use the actions themselves as keys for the reducers rather than strings which are error prone. You never know what the new dev on your project might do... Maybe (s)he will not realize that the new constant (s)he just introduced was already existing and now everything is broken and a wormhole will appear and it will be the end of mankind. Let's prevent that!
 
@@ -75,22 +74,26 @@ counterStore.dispatch(add(5)); // counterStore.getState() === 6
 import { createStore } from 'redux';
 import { createAction, createReducer } from 'redux-act';
 
+// You can create several action creators at once
+// (but that's probably not the best way to do it)
+const [increment, decrement] = ['inc', 'dec'].map(createAction);
+
 // When creating action creators, the description is optional
 // it will only be used for devtools and logging stuff.
 // It's better to put something but feel free to leave it empty if you want to.
-const replace = createAction();
+let replace = createAction();
 
 // By default, the payload of the action is the first argument
 // when you call the action. If you need to support several arguments,
 // you can specify a function on how to merge all arguments into
 // an unique payload.
-const append = createAction('optional description', (...args)=> args.join(''));
+let append = createAction('optional description', (...args) => args.join(''));
 
 // There is another pattern to create reducers
 // and it works fine with ES5! (maybe even ES3 \o/)
 const stringReducer = createReducer(function (on) {
-  on(append, (state, payload)=> state += payload);
-  on(replace, (state, payload)=> payload);
+  on(append, (state, payload) => state += payload);
+  on(replace, (state, payload) => payload);
   // Warning! If you use the same action twice,
   // the second one will override the previous one.
 }, 'missing a lette'); // <-- Default state
@@ -100,8 +103,8 @@ const stringReducer = createReducer(function (on) {
 // rather than binding them in each component, you can do it
 // once you've created both the store and your actions
 const stringStore = createStore(stringReducer);
-append.bindTo(stringStore);
-replace.bindTo(stringStore);
+replace = append.assignTo(stringStore);
+append = replace.assignTo(stringStore);
 
 // Now, when calling actions, they will be automatically dispatched
 append('r'); // stringStore.getState() === 'missing a letter'
@@ -120,7 +123,7 @@ const metaAction = createAction('desc', arg => arg, arg => {meta: 'so meta!'});
 
 // Metadata will be the third argument of the reduce function
 createReducer({
-  [metaAction]: (state, payload, meta)=> payload
+  [metaAction]: (state, payload, meta) => payload
 });
 ```
 
@@ -144,9 +147,9 @@ const simpleAction = createAction();
 // Better to add a description
 const betterAction = createAction('This is better!');
 // Support multiple arguments by merging them
-const multipleAction = createAction((text, checked)=> ({text, checked}))
+const multipleAction = createAction((text, checked) => ({text, checked}))
 // Again, better to add a description
-const bestAction = createAction('Best. Action. Ever.', (text, checked)=> ({text, checked}))
+const bestAction = createAction('Best. Action. Ever.', (text, checked) => ({text, checked}))
 // Serializable action
 const serializableAction = createAction('SERIALIZABLE_ACTION');
 ```
@@ -163,7 +166,7 @@ const addTodo = createAction('Add todo');
 addTodo('content');
 // return { __id__: 1, type: '[1] Add todo', payload: 'content' }
 
-const editTodo = createAction('Edit todo', (id, content)=> ({id, content}));
+const editTodo = createAction('Edit todo', (id, content) => ({id, content}));
 editTodo(42, 'the answer');
 // return { __id__: 2, type: '[2] Edit todo', payload: {id: 42, content: 'the answer'} }
 
@@ -172,24 +175,24 @@ serializeTodo(1);
 // return { __id__: 'SERIALIZE_TODO', type: 'SERIALIZE_TODO', payload: 1 }
 ```
 
-Remember that you still need to dispatch those actions. If you already have one or more stores, you can bind the action to them so it will be automatically dispatched using the `bindTo` function. Notice that each call to `bindTo` will override any previous call.
+Remember that you still need to dispatch those actions. If you already have one or more stores, you can bind the action using the `assignTo` function. It will return a new action creator function which will automatically dispatch its action.
 
 ```javascript
-const action = createAction();
+let action = createAction();
 const reducer = createReducer({
-  [action]: (state)=> state * 2
+  [action]: (state) => state * 2
 });
 const store = createStore(reducer, 1);
 const store2 = createStore(reducer, -1);
 
 // Automatically dispatch the action to the store when called
-action.bindTo(store);
+action = action.assignTo(store);
 action(); // store.getState() === 2
 action(); // store.getState() === 4
 action(); // store.getState() === 8
 
 // You can bind the action to several stores using an array
-action.bindTo([store, store2]);
+action = action.assignTo([store, store2]);
 action();
 // store.getState() === 16
 // store2.getState() === -2
@@ -206,7 +209,7 @@ action();
 
 It's kind of the same syntax as the `Array.prototype.reduce` function. You can specify how to reduce as the first argument and the accumulator, or default state, as the second one. The default state is optional since you can retrieve it from the store when creating it but you should consider always having a default state inside a reducer, especially if you want to use it with `combineReducers` which make such default state mandatory.
 
-There are two patterns to create a reducer. One is passing an object as a map of `action creators` to `reduce functions`. Such functions have the following signature: `(previousState, payload)=> newState`. The other one is using a function factory. Rather than trying to explaining it, just read the following examples.
+There are two patterns to create a reducer. One is passing an object as a map of `action creators` to `reduce functions`. Such functions have the following signature: `(previousState, payload) => newState`. The other one is using a function factory. Rather than trying to explaining it, just read the following examples.
 
 ```javascript
 const increment = createAction();
@@ -214,14 +217,14 @@ const add = createAction();
 
 // First pattern
 const reducerMap = createReducer({
-  [increment]: (state)=> state + 1,
-  [add]: (state, payload)=> state + payload
+  [increment]: (state) => state + 1,
+  [add]: (state, payload) => state + payload
 }, 0);
 
 // Second pattern
 const reducerFactory = createReducer(function (on, off) {
-  on(increment, (state)=> state + 1);
-  on(add, (state, payload)=> state + payload);
+  on(increment, (state) => state + 1);
+  on(add, (state, payload) => state + payload);
   // See pro tip below for "off" usage
 }, 0);
 ```
@@ -232,8 +235,8 @@ Since an action is an object with some metadata (`__id__` and `type`) and a `pay
 const add = createAction();
 const sub = createAction();
 const reducer = createReducer({
-  [add]: (state, action)=> state + action.payload,
-  [sub]: (state, action)=> state - action.payload
+  [add]: (state, action) => state + action.payload,
+  [sub]: (state, action) => state - action.payload
 }, 0);
 
 reducer.options({
@@ -249,8 +252,8 @@ const handlers = {};
 const reducer = createReducer(handlers, 0);
 const store = createStore(reducer);
 
-const increment = createAction().bindTo(store);
-handlers[increment] = (state)=> state + 1;
+const increment = createAction().assignTo(store);
+handlers[increment] = (state) => state + 1;
 
 increment(); // store.getState() === 1
 increment(); // store.getState() === 2
@@ -265,9 +268,9 @@ increment(); // store.getState() === 2
 // you used to create the reducer
 const reducer = createReducer({}, 0);
 const store = createStore(reducer);
-const increment = createAction().bindTo(store);
+const increment = createAction().assignTo(store);
 
-reducer.on(increment, (state)=> state + 1);
+reducer.on(increment, (state) => state + 1);
 
 increment(); // store.getState() === 1
 increment(); // store.getState() === 2
@@ -279,7 +282,8 @@ increment(); // store.getState() === 2
 
 // Using the 'on' and 'off' functions of the function factory
 // when creating the reducer
-const increment = createAction();
+const store = createStore(()=> true));
+const increment = createAction().assignTo(store);
 const reducer = createReducer(function (on, off) {
   on(increment, state => {
     // Just for fun, we will disable increment when reaching 2
@@ -291,8 +295,7 @@ const reducer = createReducer(function (on, off) {
   });
 }, 0);
 
-const store = createStore(reducer);
-increment.bindTo(store);
+store.replaceReducer(reducer);
 
 increment(); // store.getState() === 1
 increment(); // store.getState() === 2
@@ -301,7 +304,7 @@ increment(); // store.getState() === 3
 increment(); // store.getState() === 3
 ```
 
-### bindAll(actionCreators, stores)
+### assignAll(actionCreators, stores)
 
 #### Parameters
 
@@ -313,6 +316,12 @@ increment(); // store.getState() === 3
 A common pattern is to export a set of action creators as an object. If you want to bind all of them to a store, there is this super small helper. You can also use an array of action creators. And since you can bind to one or several stores, you can specify either one store or an array of stores.
 
 ```javascript
+// store.js
+// We are creating an empty store,
+// we will replace its reducer later
+import { createStore } from 'redux';
+export default createStore(() => true);
+
 // actions.js
 export const add = createAction('Add');
 export const sub = createAction('Sub');
@@ -320,18 +329,83 @@ export const sub = createAction('Sub');
 // reducer.js
 import * as actions from './actions';
 export default createReducer({
-  [actions.add]: (state, payload)=> state + payload,
-  [actions.sub]: (state, payload)=> state - payload
+  [actions.add]: (state, payload) => state + payload,
+  [actions.sub]: (state, payload) => state - payload
 }, 0);
+
+//
 
 // store.js
 import * as actions from './actions';
 import reducer from './reducer';
 
 const store = createStore(reducer);
-bindAll(actions, store);
+assignAll(actions, store);
 
 export default store;
+```
+
+### batch(actions)
+
+#### Parameters
+
+- **actions** (array of actions): wrap an array of actions inside another action and will reduce them all at once when dispatching it.
+
+**Warning** Does not work with binded actions by default since those will be dispatched immediately when called. You will need to use the `raw` method for such actions. See usage below.
+
+### Usage
+
+Useful when you need to run a sequence of actions without impacting your whole application after each one but rather after all of them are done. For example, if you are using `@connect` from `react-redux`, it is called after each action by default. Using `batch`, it will be called only when all actions in the array have been reduced.
+
+```javascript
+import { createAction, createReducer, batch } from 'redux-act';
+
+// Basic actions
+const inc = createAction();
+const dec = createAction();
+
+const reducer = createReducer({
+  [inc]: state => state + 1,
+  [dec]: state => state - 1,
+}, 0);
+
+store = createStore(reducer);
+store.dispatch(batch([inc(), inc(), dec(), inc()]));
+store.getState(); // 2
+
+// Binded actions
+inc.assignTo(store);
+dec.assignTo(store);
+
+// You still need to dispatch the batch action, you cannot bind it
+// You will need to use the 'raw' function on the action creators to prevent
+// the auto-dipatch from the binding
+store.dispatch(batch([inc.raw(), dec.raw(), dec.raw()]));
+store.getState(); // 1
+```
+
+### disbatch(store | dispatch, [actions])
+
+#### Parameters
+
+- **store | dispatch** (object, which is a Redux store, or a dispatch function): add a `disbatch` function to the store if it is the only parameter. Just like `dispatch` but for several actions which will be batched as a single one.
+- **actions** (array, optional): the array of actions to dispatch as a batch of actions.
+
+#### Usage
+
+```javascript
+import { disbatch } from 'redux-act';
+const actions = [inc(), inc(), dec(), inc()];
+
+// Augment store
+disbatch(store);
+store.disbatch(actions);
+
+// Disbatch immediately from store
+disbatch(store, actions);
+
+// Disbatch immediately from dispatch
+disbatch(store.dispatch, actions);
 ```
 
 ## Cookbook
@@ -347,8 +421,8 @@ const start = createAction();
 const success = createAction();
 
 const reducer = createReducer({
-  [start]: (state)=> ({ ...state, running: true }),
-  [success]: (state, result)=> ({ running: false, result })
+  [start]: (state) => ({ ...state, running: true }),
+  [success]: (state, result) => ({ running: false, result })
 }, {
   running: false,
   result: false
@@ -372,7 +446,7 @@ function fetch() {
     return new Promise(resolve => {
       // Here, you should probably do a real async call,
       // like, you know, XMLHttpRequest or Global.fetch stuff
-      setTimeout(()=>
+      setTimeout(() =>
         resolve(1)
       , 5);
     }).then(result=>
@@ -382,7 +456,7 @@ function fetch() {
   };
 }
 
-store.dispatch(fetch()).then(()=> {
+store.dispatch(fetch()).then(() => {
   // state: { running: false, result: 1 }
 });
 
@@ -390,8 +464,8 @@ store.dispatch(fetch()).then(()=> {
 // and directly call the actions
 const store = createStore(reducer);
 
-start.bindTo(store);
-success.bindTo(store);
+start.assignTo(store);
+success.assignTo(store);
 
 function fetch() {
   // state: { running: false, result: false }
@@ -400,7 +474,7 @@ function fetch() {
   return new Promise(resolve => {
     // Here, you should probably do a real async call,
     // like, you know, XMLHttpRequest or Global.fetch stuff
-    setTimeout(()=>
+    setTimeout(() =>
       resolve(1)
     , 5);
   }).then(result=>
@@ -409,9 +483,102 @@ function fetch() {
   );
 }
 
-fetch().then(()=> {
+fetch().then(() => {
   // state: { running: false, result: 1 }
 });
+```
+
+### File organization
+
+```javascript
+// empty_store.js
+// An empty store to get a reference on it
+import { createStore } from 'redux';
+export default createStore(() => true)
+
+// ----------------------------------------------
+// counter.js
+import { createAction, createReducer } from 'redux-act';
+import store from './empty_store';
+
+// export actions (binded or not)
+export const inc = createAction('increment').assignTo(store);
+export const dec = createAction('increment').assignTo(store);
+
+// export the reducer as the default one
+export default createReducer({
+  [inc]: state => state + 1,
+  [dec]: state => state - 1,
+}, 0);
+
+// ----------------------------------------------
+// todos.js
+import { createAction, createReducer } from 'redux-act';
+
+// export actions (binded or not)
+export const add = createAction('add todo');
+export const remove = createAction('increment');
+
+// export the reducer as the default one
+export default createReducer({
+  [add]: (state, text) => state.concat({ text, done: false }),
+  [remove]: (state, index) => state.slice(index, 1),
+}, []);
+
+// ----------------------------------------------
+// store.js
+// create your real store
+import { combineReducers } from 'redux';
+import store from './empty_store';
+
+// import reducers
+import counter from './counter';
+import todos from './todos';
+
+store.replaceReducer(combineReducers({
+  counter,
+  todos,
+}));
+
+export default store;
+
+// ----------------------------------------------
+// service.js
+// use your stuff
+import store from './store';
+import { inc, dec } from './counter';
+import { add, remove } from './todos';
+
+// Binded actions
+inc();
+inc();
+dec();
+inc();
+store.getState().counter; // 2
+
+store.dispatch(add('Support batch'));
+store.dispatch(add('Rulez da world'));
+store.dispatch(add('Release 0.3'));
+store.dispatch(remove(1));
+store.getState().todos;
+// [
+//   { text: 'Support batch', done: false},
+//   { text: 'Release 0.3', done: false},
+// ]
+
+// ----------------------------------------------
+// app.js
+// if using React
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import store from './store';
+
+ReactDOM.render(
+  <Provider store={store}>
+    <div>Your app</div>
+  </Provider>,
+  document.getElementById('app')
+);
 ```
 
 ## Thanks

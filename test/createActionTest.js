@@ -11,7 +11,7 @@ describe('createAction', function () {
   function testActionCreator(actionCreator) {
     expect(actionCreator).to.be.a('function');
     expect(actionCreator.toString).to.be.a('function');
-    expect(actionCreator.bindTo).to.be.a('function');
+    expect(actionCreator.assignTo).to.be.a('function');
   }
 
   function testAction(action, payload, description, meta) {
@@ -155,8 +155,8 @@ describe('createAction', function () {
 
   it('should bind to a store', function () {
     const store = createStore(reducer, {first: 0, second: ''});
-    firstAction.bindTo(store);
-    secondAction.bindTo(store);
+    firstAction.assignTo(store);
+    secondAction.assignTo(store);
 
     firstAction(1);
     expect(store.getState()).to.deep.equal({first: 1, second: ''});
@@ -172,11 +172,11 @@ describe('createAction', function () {
     expect(store.getState()).to.deep.equal({first: 42, second: '123, 4 - true0a, false - '});
   });
 
-  it('should chain correctly using bindTo', function () {
+  it('should chain correctly using assignTo', function () {
     const actions = {};
     const reducer = createReducer(actions, 0);
     const store = createStore(reducer);
-    const action = createAction().bindTo(store);
+    const action = createAction().assignTo(store);
     actions[action] = (state)=> state + 1;
 
     action();
@@ -201,8 +201,8 @@ describe('createAction', function () {
 
     const store = createStore(reducer);
 
-    start.bindTo(store);
-    success.bindTo(store);
+    start.assignTo(store);
+    success.assignTo(store);
 
     function fetch() {
       start();
@@ -283,8 +283,8 @@ describe('createAction', function () {
 
     const store = createStore(reducer);
 
-    start.bindTo(store);
-    success.bindTo(store);
+    start.assignTo(store);
+    success.assignTo(store);
 
     function fetch() {
       start();
