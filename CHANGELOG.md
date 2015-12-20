@@ -10,7 +10,7 @@ This is probably the last release before 1.0. Just want to battle test it in pro
 
 Those functions replace `bindTo` and `bindAll`. Same feature.
 
-## bindTo
+## bindTo and bindAll
 
 Now returns a new action creator which will act just like the original one but no longer mutate it.
 
@@ -57,7 +57,7 @@ dispatch(batch(a1(), a2(), a3()));
 dispatch(batch([a1(), a2(), a3()]));
 ```
 
-:warning: **Warning** This does not work with binded or assigned action creators. They need to return an action object, not automatically dispatch it. If you are using those features (because, you know, they are awesome), you can call the `???` method to retrieve the action object directly without dispatching it.
+:warning: **Warning** This does not work with binded or assigned action creators. They need to return an action object, not automatically dispatch it. If you are using those features (because, you know, they are awesome), you can call the `act` method to retrieve the action object directly without dispatching it.
 
 ```javascript
 // Assigned action creators
@@ -65,12 +65,12 @@ const a1 = createAction();
 const a2 = createAction();
 a1.assignTo(store);
 a2.assignTo(store);
-store.dispatch(batch(a1.???(), a2.???()));
+store.dispatch(batch(a1.act(), a2.act()));
 
 // Binded action creators
 const a1 = createAction().bindTo(store);
 const a2 = createAction().bindTo(store);
-store.dispatch(batch(a1.???(), a2.???()));
+store.dispatch(batch(a1.act(), a2.act()));
 ```
 
 You can do some other funny stuff, just because.
@@ -101,6 +101,29 @@ disbatch(store.dispatch, [a1(), a2()]);
 disbatch(store);
 store.disbatch(a1(), a2());
 store.disbatch([a1(), a2()]);
+```
+
+## Action creator status
+
+You can now test the status of an action creator.
+
+```javascript
+const action = createAction();
+const store = createStore(() => 0);
+
+action.assigned(); // false, not assigned
+action.binded(); // false, not binded
+action.dispatched(); // false, test if either assigned or binded
+
+action.assignTo(store);
+action.assigned(); // true
+action.binded(); // false
+action.dispatched(); // true
+
+const bindedAction = action.bindTo(store);
+bindedAction.assigned(); // false
+bindedAction.binded(); // true
+bindedAction.dispatched(); // true
 ```
 
 # 0.2.0

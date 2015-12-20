@@ -16,10 +16,10 @@ npm install redux-act --save
 - [API](#api)
   - [createAction](#createactiondescription-payloadreducer-metareducer)
   - [createReducer](#createreducerhandlers-defaultstate)
-  - [assignAll](#assignAllactioncreators-stores)
-  - [bindAll](#bindAllactioncreators-stores)
+  - [assignAll](#assignallactioncreators-stores)
+  - [bindAll](#bindallactioncreators-stores)
   - [batch](#batchactions)
-  - [disbatch](#disbatch)
+  - [disbatch](#disbatchstore--dispatch-actions)
 - [Cookbook](#cookbook)
   - [Async actions](#async-actions)
   - [Enable or disable batch](#enable-or-disable-batch)
@@ -179,7 +179,7 @@ serializeTodo(1);
 // return { __id__: 'SERIALIZE_TODO', type: 'SERIALIZE_TODO', payload: 1 }
 ```
 
-Remember that you still need to dispatch those actions. If you already have one or more stores, you can assign the action using the `assignTo` function. This will mutate the action creator itself. If you need immutability, you can use `bindTo`. It will return a new action creator function which will automatically dispatch its action.
+Remember that you still need to dispatch those actions. If you already have one or more stores, you can assign the action using the `assignTo` function. This will mutate the action creator itself. If you need immutability, you can use `bindTo`, it will return a new action creator function which will automatically dispatch its action.
 
 ```javascript
 let action = createAction();
@@ -192,13 +192,13 @@ const store = createStore(reducer, 1);
 const store2 = createStore(reducer, -1);
 
 // Automatically dispatch the action to the store when called
-action = action.assignTo(store);
+action.assignTo(store);
 action(); // store.getState() === 2
 action(); // store.getState() === 4
 action(); // store.getState() === 8
 
 // You can assign the action to several stores using an array
-action = action.assignTo([store, store2]);
+action.assignTo([store, store2]);
 action();
 // store.getState() === 16
 // store2.getState() === -2
@@ -393,13 +393,13 @@ export bindAll(actions, store);
 
 - **actions** (objects | array): wrap an array of actions inside another action and will reduce them all at once when dispatching it. You can also call this function with several actions as arguments.
 
-:warning: **Warning** Does not work with assigned and binded actions by default since those will be dispatched immediately when called. You will need to use the `???` method for such actions. See usage below.
+:warning: **Warning** Does not work with assigned and binded actions by default since those will be dispatched immediately when called. You will need to use the `act` method for such actions. See usage below.
 
 ### Usage
 
 Useful when you need to run a sequence of actions without impacting your whole application after each one but rather after all of them are done. For example, if you are using `@connect` from `react-redux`, it is called after each action by default. Using `batch`, it will be called only when all actions in the array have been reduced.
 
-`batch` is an action creator like any other created using `createAction`. You can assign or bind it if you want, especially if you only have one store. You can even use inside reducers. It is enabled by default, but you can remove it and put it back.
+`batch` is an action creator like any other created using `createAction`. You can assign or bind it if you want, especially if you only have one store. You can even use it inside reducers. It is enabled by default, but you can remove it and put it back.
 
 ```javascript
 import { createAction, createReducer, batch } from 'redux-act';
@@ -413,7 +413,7 @@ const reducer = createReducer({
   [dec]: state => state - 1,
 }, 0);
 
-store = createStore(reducer);
+const store = createStore(reducer);
 // actions as arguments
 store.dispatch(batch(inc(), inc(), dec(), inc()));
 // actions as an array
@@ -425,10 +425,10 @@ inc.assignTo(store);
 dec.assignTo(store);
 
 // You still need to dispatch the batch action
-// You will need to use the '???' function on the action creators to prevent
+// You will need to use the 'act' function on the action creators to prevent
 // the auto-dipatch from the binding
-store.dispatch(batch(inc.???(), dec.???(), dec.???()));
-store.dispatch(batch([inc.???(), dec.???(), dec.???()]));
+store.dispatch(batch(inc.act(), dec.act(), dec.act()));
+store.dispatch(batch([inc.act(), dec.act(), dec.act()]));
 store.getState(); // 2
 
 // Let's de-assign our actions

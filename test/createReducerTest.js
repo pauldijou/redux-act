@@ -1,6 +1,6 @@
 import chai from 'chai';
 import {createStore, combineReducers} from 'redux';
-import {createAction, createReducer} from '../src/index';
+import {createAction, createReducer, batch} from '../src/index';
 const expect = chai.expect;
 
 describe('createReducer', function () {
@@ -207,4 +207,54 @@ describe('createReducer', function () {
     expect(store.getState()).to.equal(2);
   });
 
+  it('should support empty handlers', function () {
+    const action = createAction();
+    const reducer = createReducer();
+    const store = createStore(reducer);
+    store.dispatch(action());
+    expect(store.getState()).to.equal(undefined);
+  });
+
+  it('should accept batch when defined', function () {
+    const reducer = createReducer({
+      [batch]: (state) => state + 1, // just for fun, never do that
+    }, 0);
+    const store = createStore(reducer);
+    expect(store.getState()).to.equal(0);
+    store.dispatch(batch());
+    expect(store.getState()).to.equal(1);
+    store.dispatch(batch());
+    expect(store.getState()).to.equal(2);
+  });
+
+  it('should test if it has a handler', function () {
+    const a1 = createAction();
+    const a2 = createAction();
+    const reducer = createReducer({
+      [a1]: () => 1,
+      [a2]: () => 2,
+    }, 0);
+
+    expect(reducer.has(a1)).to.be.true;
+    expect(reducer.has(a2)).to.be.true;
+    expect(reducer.has(batch)).to.be.true;
+
+    reducer.off(a2);
+
+    expect(reducer.has(a1)).to.be.true;
+    expect(reducer.has(a2)).to.be.false;
+    expect(reducer.has(batch)).to.be.true;
+
+    reducer.off(a1);
+
+    expect(reducer.has(a1)).to.be.false;
+    expect(reducer.has(a2)).to.be.false;
+    expect(reducer.has(batch)).to.be.true;
+
+    reducer.on(a2, () => 2);
+
+    expect(reducer.has(a1)).to.be.false;
+    expect(reducer.has(a2)).to.be.true;
+    expect(reducer.has(batch)).to.be.true;
+  });
 });

@@ -1,6 +1,4 @@
 export default function assignAll(actions, stores) {
-  if (!actions || !stores) return;
-
   if (Array.isArray(actions)) {
     return actions.map(action => action.assignTo(stores));
   } else {

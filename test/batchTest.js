@@ -111,4 +111,13 @@ describe('batch', function () {
     expect(store.getState()).to.equal(1);
     expect(spy).to.have.been.called.exactly(1);
   });
+
+  it('should support empty payload', function () {
+    const { inc, dec, reducer, store, spy } = init();
+    expect(store.getState()).to.equal(0);
+    expect(spy).to.have.been.called.exactly(0);
+    store.dispatch(batch());
+    expect(store.getState()).to.equal(0);
+    expect(spy).to.have.been.called.exactly(1);
+  });
 });

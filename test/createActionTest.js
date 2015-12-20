@@ -19,6 +19,9 @@ describe('createAction', function () {
     expect(action).to.contain.keys(ID, 'type', 'payload', 'meta');
     expect(action[ID]).to.be.a('number');
     expect(action.type).to.be.a('string');
+    if (typeof description === 'string') {
+      expect(action.type).to.contain(description);
+    }
     expect(action.payload).to.deep.equal(payload);
     if (typeof meta !== 'undefined') {
       expect(action.meta).to.deep.equal(meta);
@@ -153,7 +156,7 @@ describe('createAction', function () {
     expect(store.getState()).to.deep.equal({first: 42, second: '123, 4 - true0a, false - '});
   });
 
-  it('should bind to a store', function () {
+  it('should assign to a store', function () {
     const store = createStore(reducer, {first: 0, second: ''});
     firstAction.assignTo(store);
     secondAction.assignTo(store);
@@ -169,6 +172,25 @@ describe('createAction', function () {
     expect(store.getState()).to.deep.equal({first: 42, second: '123, 4 - '});
 
     secondAction(true, 0, ['a', false]);
+    expect(store.getState()).to.deep.equal({first: 42, second: '123, 4 - true0a, false - '});
+  });
+
+  it('should bind to a store', function () {
+    const store = createStore(reducer, {first: 0, second: ''});
+    const bfirstAction = firstAction.bindTo(store);
+    const bsecondAction = secondAction.bindTo(store);
+
+    bfirstAction(1);
+    expect(store.getState()).to.deep.equal({first: 1, second: ''});
+
+    bsecondAction(1, '2', [3, '4']);
+    expect(store.getState()).to.deep.equal({first: 1, second: '123, 4 - '});
+
+    bfirstAction(20);
+    bfirstAction(21);
+    expect(store.getState()).to.deep.equal({first: 42, second: '123, 4 - '});
+
+    bsecondAction(true, 0, ['a', false]);
     expect(store.getState()).to.deep.equal({first: 42, second: '123, 4 - true0a, false - '});
   });
 
@@ -331,5 +353,34 @@ describe('createAction', function () {
     expect(action.assigned()).to.be.false;
     expect(action.binded()).to.be.false;
     expect(action.dispatched()).to.be.false;
-  })
+  });
+
+  it('should not be assignable nor bindable once binded', function () {
+    const store = createStore(() => 0);
+    const action = createAction().bindTo(store);
+    expect(action).to.equal(action.assignTo(store));
+    expect(action).to.equal(action.bindTo(store));
+  });
+
+  it('should return raw actions', function () {
+    const action = createAction();
+    const reducer = createReducer({
+      [action]: (state) => state + 1
+    }, 0);
+    const store = createStore(reducer);
+
+    testActionCreator(action);
+    testAction(action(1), 1);
+    testAction(action.act(1), 1);
+    expect(store.getState()).to.equal(0);
+
+    action.assignTo(store);
+    testAction(action.act(1), 1);
+    expect(store.getState()).to.equal(0);
+
+    const bindedAction = action.bindTo(store);
+    testAction(bindedAction.act(1), 1);
+    expect(store.getState()).to.equal(0);
+
+  });
 });
