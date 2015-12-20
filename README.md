@@ -12,13 +12,17 @@ npm install redux-act --save
 
 - [Usage](#usage)
 - [FAQ](#faq)
-- [Avanced usage](#advanced-usage)
+- [Advanced usage](#advanced-usage)
 - [API](#api)
   - [createAction](#createactiondescription-payloadreducer-metareducer)
   - [createReducer](#createreducerhandlers-defaultstate)
   - [assignAll](#assignAllactioncreators-stores)
+  - [bindAll](#bindAllactioncreators-stores)
+  - [batch](#batchactions)
+  - [disbatch](#disbatch)
 - [Cookbook](#cookbook)
   - [Async actions](#async-actions)
+  - [Enable or disable batch](#enable-or-disable-batch)
 
 ## Usage
 
@@ -39,7 +43,7 @@ const dec = createAction('decrement the state');
 const counterReducer = createReducer({
   [increment]: (state) => state + 1,
   [decrement]: (state) => state - 1,
-  [add]: (state, payload) => state + payload
+  [add]: (state, payload) => state + payload,
 }, 0); // <-- This is the default state
 
 // Create the store
@@ -175,12 +179,14 @@ serializeTodo(1);
 // return { __id__: 'SERIALIZE_TODO', type: 'SERIALIZE_TODO', payload: 1 }
 ```
 
-Remember that you still need to dispatch those actions. If you already have one or more stores, you can bind the action using the `assignTo` function. It will return a new action creator function which will automatically dispatch its action.
+Remember that you still need to dispatch those actions. If you already have one or more stores, you can assign the action using the `assignTo` function. This will mutate the action creator itself. If you need immutability, you can use `bindTo`. It will return a new action creator function which will automatically dispatch its action.
 
 ```javascript
 let action = createAction();
+let action2 = createAction();
 const reducer = createReducer({
-  [action]: (state) => state * 2
+  [action]: (state) => state * 2,
+  [action2]: (state) => state / 2,
 });
 const store = createStore(reducer, 1);
 const store2 = createStore(reducer, -1);
@@ -191,11 +197,36 @@ action(); // store.getState() === 2
 action(); // store.getState() === 4
 action(); // store.getState() === 8
 
-// You can bind the action to several stores using an array
+// You can assign the action to several stores using an array
 action = action.assignTo([store, store2]);
 action();
 // store.getState() === 16
 // store2.getState() === -2
+
+// You can un-assign
+action.assignTo(undefined);
+action(); // store.getState() === 16
+
+// If you need more immutability, you can bind them, creating a new action creator
+const bindedAction = action2.bindTo(store);
+action2(); // Not doing anything since not assigned nor binded
+// store.getState() === 16
+// store2.getState() === -2
+bindedAction(); // store.getState() === 8
+
+// You can test the status of your action creator
+action.assigned(); // false, not assigned anymore
+action.binded(); // false, not binded
+action.dispatched(); // false, test if either assigned or binded
+
+bindedAction.assigned(); // false
+bindedAction.binded(); // true
+bindedAction.dispatched(); // true
+
+action.assignTo(store);
+action.assigned(); // true
+action.binded(); // false
+action.dispatched(); // true
 ```
 
 ### createReducer(handlers, [defaultState])
@@ -308,7 +339,7 @@ increment(); // store.getState() === 3
 
 #### Parameters
 
-- **actionCreators** (object or array): which action creators to bind. If it's an object, it's a map of name -> action creator, useful when importing several actions at once.
+- **actionCreators** (object or array): which action creators to assign. If it's an object, it's a map of name -> action creator, useful when importing several actions at once.
 - **stores** (object or array): the target store(s) when dispatching actions. Can be only one or several inside an array.
 
 #### Usage
@@ -316,12 +347,6 @@ increment(); // store.getState() === 3
 A common pattern is to export a set of action creators as an object. If you want to bind all of them to a store, there is this super small helper. You can also use an array of action creators. And since you can bind to one or several stores, you can specify either one store or an array of stores.
 
 ```javascript
-// store.js
-// We are creating an empty store,
-// we will replace its reducer later
-import { createStore } from 'redux';
-export default createStore(() => true);
-
 // actions.js
 export const add = createAction('Add');
 export const sub = createAction('Sub');
@@ -333,8 +358,6 @@ export default createReducer({
   [actions.sub]: (state, payload) => state - payload
 }, 0);
 
-//
-
 // store.js
 import * as actions from './actions';
 import reducer from './reducer';
@@ -345,17 +368,38 @@ assignAll(actions, store);
 export default store;
 ```
 
+### bindAll(actionCreators, stores)
+
+#### Parameters
+
+- **actionCreators** (object or array): which action creators to bind. If it's an object, it's a map of name -> action creator, useful when importing several actions at once.
+- **stores** (object or array): the target store(s) when dispatching actions. Can be only one or several inside an array.
+
+#### Usage
+
+Just like `assignAll`, you can bind several action creators at once.
+
+```javascript
+import { bindAll } from 'redux-act';
+import store from './store';
+import * as actions from './actions';
+
+export bindAll(actions, store);
+```
+
 ### batch(actions)
 
 #### Parameters
 
-- **actions** (array of actions): wrap an array of actions inside another action and will reduce them all at once when dispatching it.
+- **actions** (objects | array): wrap an array of actions inside another action and will reduce them all at once when dispatching it. You can also call this function with several actions as arguments.
 
-**Warning** Does not work with binded actions by default since those will be dispatched immediately when called. You will need to use the `raw` method for such actions. See usage below.
+:warning: **Warning** Does not work with assigned and binded actions by default since those will be dispatched immediately when called. You will need to use the `???` method for such actions. See usage below.
 
 ### Usage
 
 Useful when you need to run a sequence of actions without impacting your whole application after each one but rather after all of them are done. For example, if you are using `@connect` from `react-redux`, it is called after each action by default. Using `batch`, it will be called only when all actions in the array have been reduced.
+
+`batch` is an action creator like any other created using `createAction`. You can assign or bind it if you want, especially if you only have one store. You can even use inside reducers. It is enabled by default, but you can remove it and put it back.
 
 ```javascript
 import { createAction, createReducer, batch } from 'redux-act';
@@ -370,18 +414,46 @@ const reducer = createReducer({
 }, 0);
 
 store = createStore(reducer);
+// actions as arguments
+store.dispatch(batch(inc(), inc(), dec(), inc()));
+// actions as an array
 store.dispatch(batch([inc(), inc(), dec(), inc()]));
-store.getState(); // 2
+store.getState(); // 4
 
 // Binded actions
 inc.assignTo(store);
 dec.assignTo(store);
 
-// You still need to dispatch the batch action, you cannot bind it
-// You will need to use the 'raw' function on the action creators to prevent
+// You still need to dispatch the batch action
+// You will need to use the '???' function on the action creators to prevent
 // the auto-dipatch from the binding
-store.dispatch(batch([inc.raw(), dec.raw(), dec.raw()]));
+store.dispatch(batch(inc.???(), dec.???(), dec.???()));
+store.dispatch(batch([inc.???(), dec.???(), dec.???()]));
+store.getState(); // 2
+
+// Let's de-assign our actions
+inc.assignTo(undefined);
+dec.assignTo(undefined);
+
+// You can bind batch
+const bindedBatch = batch.bind(store);
+batch(inc(), inc());
+store.getState(); // 4
+
+// You can assign batch
+batch.assignTo(store);
+batch(dec(), dec(), dec());
 store.getState(); // 1
+
+// You can remove batch from a reducer
+reducer.off(batch);
+batch(dec(), dec());
+store.getState(); // 1
+
+// You can put it back
+reducer.on(batch, (state, payload) => payload.reduce(reducer, state));
+batch(dec(), dec());
+store.getState(); // -1
 ```
 
 ### disbatch(store | dispatch, [actions])
@@ -395,6 +467,20 @@ store.getState(); // 1
 
 ```javascript
 import { disbatch } from 'redux-act';
+import { inc, dec } from './actions';
+
+// 1) Not using an array
+// Augment store
+disbatch(store);
+store.disbatch(inc(), inc(), dec(), inc());
+
+// Disbatch immediately from store
+disbatch(store, inc(), inc(), dec(), inc());
+
+// Disbatch immediately from dispatch
+disbatch(store.dispatch, inc(), inc(), dec(), inc());
+
+// 2) Using an array
 const actions = [inc(), inc(), dec(), inc()];
 
 // Augment store
@@ -488,97 +574,23 @@ fetch().then(() => {
 });
 ```
 
-### File organization
+### Enable or disable batch
+
+Since `batch` is an action creator like any other, you can add and remove it from any reducer.
 
 ```javascript
-// empty_store.js
-// An empty store to get a reference on it
-import { createStore } from 'redux';
-export default createStore(() => true)
+import { createReducer, batch } from 'redux-act';
+const reducer = createReducer({});
 
-// ----------------------------------------------
-// counter.js
-import { createAction, createReducer } from 'redux-act';
-import store from './empty_store';
+// Reducer no longer support batched actions
+reducer.off(batch);
 
-// export actions (binded or not)
-export const inc = createAction('increment').assignTo(store);
-export const dec = createAction('increment').assignTo(store);
+// Put it back using the reducer itself as the reduce function
+reducer.on(batch, (state, payload) => payload.reduce(reducer, state));
 
-// export the reducer as the default one
-export default createReducer({
-  [inc]: state => state + 1,
-  [dec]: state => state - 1,
-}, 0);
-
-// ----------------------------------------------
-// todos.js
-import { createAction, createReducer } from 'redux-act';
-
-// export actions (binded or not)
-export const add = createAction('add todo');
-export const remove = createAction('increment');
-
-// export the reducer as the default one
-export default createReducer({
-  [add]: (state, text) => state.concat({ text, done: false }),
-  [remove]: (state, index) => state.slice(index, 1),
-}, []);
-
-// ----------------------------------------------
-// store.js
-// create your real store
-import { combineReducers } from 'redux';
-import store from './empty_store';
-
-// import reducers
-import counter from './counter';
-import todos from './todos';
-
-store.replaceReducer(combineReducers({
-  counter,
-  todos,
-}));
-
-export default store;
-
-// ----------------------------------------------
-// service.js
-// use your stuff
-import store from './store';
-import { inc, dec } from './counter';
-import { add, remove } from './todos';
-
-// Binded actions
-inc();
-inc();
-dec();
-inc();
-store.getState().counter; // 2
-
-store.dispatch(add('Support batch'));
-store.dispatch(add('Rulez da world'));
-store.dispatch(add('Release 0.3'));
-store.dispatch(remove(1));
-store.getState().todos;
-// [
-//   { text: 'Support batch', done: false},
-//   { text: 'Release 0.3', done: false},
-// ]
-
-// ----------------------------------------------
-// app.js
-// if using React
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import store from './store';
-
-ReactDOM.render(
-  <Provider store={store}>
-    <div>Your app</div>
-  </Provider>,
-  document.getElementById('app')
-);
+// Be careful if 'payload' option is false
+reducer.options({ payload: false });
+reducer.on(batch, (state, action) => action.payload.reduce(reducer, state));
 ```
 
 ## Thanks

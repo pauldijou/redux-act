@@ -309,4 +309,27 @@ describe('createAction', function () {
     expect(store.getState().running).to.be.true;
     expect(store.getState().result).to.be.false;
   });
+
+  it('should return current status', function () {
+    const store = createStore(() => 0);
+    const action = createAction();
+    expect(action.assigned()).to.be.false;
+    expect(action.binded()).to.be.false;
+    expect(action.dispatched()).to.be.false;
+
+    action.assignTo(store);
+    expect(action.assigned()).to.be.true;
+    expect(action.binded()).to.be.false;
+    expect(action.dispatched()).to.be.true;
+
+    const bindedAction = action.bindTo(store);
+    expect(bindedAction.assigned()).to.be.false;
+    expect(bindedAction.binded()).to.be.true;
+    expect(bindedAction.dispatched()).to.be.true;
+
+    action.assignTo(undefined);
+    expect(action.assigned()).to.be.false;
+    expect(action.binded()).to.be.false;
+    expect(action.dispatched()).to.be.false;
+  })
 });

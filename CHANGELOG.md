@@ -1,6 +1,8 @@
 # 0.3.0
 
-## :warning: Breacking changes (sorry...)
+This is probably the last release before 1.0. Just want to battle test it in production before freezing the API.
+
+## :warning: Breaking changes (sorry...)
 
 `bindTo` has been renamed to `assignTo`. There is still a `bindTo` function, but now, it returns a new action creator rather than mutating the existing one. This is in order to both be closer to the actual `bind` function (which return a new function) and offer better support for immutability and server side code (where you have common actions for all requests but a store for each one, so mutating isn't an option). Just do a global find and replace of `bindTo` to `assignTo` and `bindAll` to `assignAll` and you are good to go!
 
@@ -29,6 +31,8 @@ const bindedAction = creatAction().bindTo(store.dispatch);
 
 `redux-act` now supports batched actions. You should know that each dispatched action will trigger all listeners on the store. Some libs rely on that, `react-redux` might re-render it's wrapped React component for example. So if you need to dispatch several actions at once to update different parts of your store, rather than creating a meta-action that do all the stuff inside the reducer, you can batch them so they will all be applied inside only one dispatch.
 
+`batch` is an action creator like any other created using `createAction`. You can assign or bind it if you want, especially if you only have one store. You can even use inside reducers. It is enabled by default, but you can remove it and put it back. See README for more examples.
+
 ```javascript
 import { dispatch } from './store';
 
@@ -46,8 +50,11 @@ dispatch(a3());
 
 // -- Batched strategy
 import { batch } from 'redux-act';
-dispatch(batch([a1(), a2(), a3()]));
+dispatch(batch(a1(), a2(), a3()));
 // -> trigger all store listeners only once
+
+// You can also use an array if you want
+dispatch(batch([a1(), a2(), a3()]));
 ```
 
 :warning: **Warning** This does not work with binded or assigned action creators. They need to return an action object, not automatically dispatch it. If you are using those features (because, you know, they are awesome), you can call the `???` method to retrieve the action object directly without dispatching it.
@@ -58,12 +65,12 @@ const a1 = createAction();
 const a2 = createAction();
 a1.assignTo(store);
 a2.assignTo(store);
-store.dispatch(batch([a1.???(), a2.???()]));
+store.dispatch(batch(a1.???(), a2.???()));
 
 // Binded action creators
 const a1 = createAction().bindTo(store);
 const a2 = createAction().bindTo(store);
-store.dispatch(batch([a1.???(), a2.???()]));
+store.dispatch(batch(a1.???(), a2.???()));
 ```
 
 You can do some other funny stuff, just because.
@@ -76,18 +83,23 @@ const a1 = createAction();
 const a2 = createAction();
 
 // All the following samples do the exact same thing.
+// (and each time, you have both syntax, using or not an array)
 
 // Basic batch
+store.dispatch(batch(a1(), a2()));
 store.dispatch(batch([a1(), a2()]));
 
 // Disbatch from a store
+disbatch(store, a1(), a2());
 disbatch(store, [a1(), a2()]);
 
 // Disbatch from a dispatch function
+disbatch(store.dispatch, a1(), a2());
 disbatch(store.dispatch, [a1(), a2()]);
 
 // Add the disbatch method to the store and use it
 disbatch(store);
+store.disbatch(a1(), a2());
 store.disbatch([a1(), a2()]);
 ```
 

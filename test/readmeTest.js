@@ -1,6 +1,6 @@
 import chai from 'chai';
 import {createStore, combineReducers} from 'redux';
-import {assignAll, createAction, createReducer} from '../src/index';
+import {assignAll, bindAll, createAction, createReducer, batch, disbatch} from '../src/index';
 import { ID } from '../src/constants';
 const expect = chai.expect;
 
@@ -96,8 +96,10 @@ describe('README', function () {
     expect(serializeTodoAction.payload).to.equal(1);
 
     const action = createAction();
+    let action2 = createAction();
     const reducer = createReducer({
-      [action]: (state)=> state * 2
+      [action]: (state) => state * 2,
+      [action2]: (state) => state / 2,
     });
     const store = createStore(reducer, 1);
     const store2 = createStore(reducer, -1);
@@ -118,6 +120,44 @@ describe('README', function () {
     // store2.getState() === -2
     expect(store.getState()).to.equal(16);
     expect(store2.getState()).to.equal(-2);
+
+    // You can un-assign
+    action.assignTo(undefined);
+    action(); // store.getState() === 16
+    expect(store.getState()).to.equal(16);
+
+    // If you need more immutability, you can bind them, creating a new action creator
+    const bindedAction = action2.bindTo(store);
+    action2(); // Not doing anything since not assigned nor binded
+    // store.getState() === 16
+    expect(store.getState()).to.equal(16);
+    // store2.getState() === -2
+    expect(store2.getState()).to.equal(-2);
+    bindedAction(); // store.getState() === 8
+    expect(store.getState()).to.equal(8);
+
+    // You can test the status of your action creator
+    action.assigned(); // false, not assigned anymore
+    action.binded(); // false, not binded
+    action.dispatched(); // false, test if either assigned or binded
+    expect(action.assigned()).to.be.false;
+    expect(action.binded()).to.be.false;
+    expect(action.dispatched()).to.be.false;
+
+    bindedAction.assigned(); // false
+    bindedAction.binded(); // true
+    bindedAction.dispatched(); // true
+    expect(bindedAction.assigned()).to.be.false;
+    expect(bindedAction.binded()).to.be.true;
+    expect(bindedAction.dispatched()).to.be.true;
+
+    action.assignTo(store);
+    action.assigned(); // true
+    action.binded(); // false
+    action.dispatched(); // true
+    expect(action.assigned()).to.be.true;
+    expect(action.binded()).to.be.false;
+    expect(action.dispatched()).to.be.true;
   });
 
   it('should validate createReducer API 1', function () {
@@ -209,5 +249,64 @@ describe('README', function () {
     expect(store.getState()).to.equal(3);
     increment(); // store.getState() === 3
     expect(store.getState()).to.equal(3);
+  });
+
+  it('should validate batch API', function () {
+    // Basic actions
+    const inc = createAction();
+    const dec = createAction();
+
+    const reducer = createReducer({
+      [inc]: state => state + 1,
+      [dec]: state => state - 1,
+    }, 0);
+
+    store = createStore(reducer);
+    // actions as arguments
+    store.dispatch(batch(inc(), inc(), dec(), inc()));
+    // actions as an array
+    store.dispatch(batch([inc(), inc(), dec(), inc()]));
+    store.getState(); // 4
+    expect(store.getState()).to.equal(4);
+
+    // Binded actions
+    inc.assignTo(store);
+    dec.assignTo(store);
+
+    // You still need to dispatch the batch action
+    // You will need to use the '???' function on the action creators to prevent
+    // the auto-dipatch from the binding
+    store.dispatch(batch(inc.???(), dec.???(), dec.???()));
+    store.dispatch(batch([inc.???(), dec.???(), dec.???()]));
+    store.getState(); // 2
+    expect(store.getState()).to.equal(2);
+
+    // Let's de-assign our actions
+    inc.assignTo(undefined);
+    dec.assignTo(undefined);
+
+    // You can bind batch
+    const bindedBatch = batch.bind(store);
+    batch(inc(), inc());
+    store.getState(); // 4
+    expect(store.getState()).to.equal(4);
+
+    // You can assign batch
+    batch.assignTo(store);
+    batch(dec(), dec(), dec());
+    store.getState(); // 1
+    expect(store.getState()).to.equal(1);
+
+    // You can remove batch from a reducer
+    reducer.off(batch);
+    batch(dec(), dec());
+    store.getState(); // 1
+    expect(store.getState()).to.equal(1);
+
+    // You can put it back
+    reducer.on(batch, (state, payload) => payload.reduce(reducer, state));
+    batch(dec(), dec());
+    store.getState(); // -1
+    expect(store.getState()).to.equal(-1);
   });
 });

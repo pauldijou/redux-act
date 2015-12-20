@@ -1,9 +1,14 @@
 import { ID } from './constants';
+import batch from './batch';
 
 export default function createReducer(handlers = {}, defaultState) {
   let opts = {
     payload: true
   };
+
+  function has(actionCreator) {
+    return !!handlers[actionCreator.toString()];
+  }
 
   function on(actionCreator, handler) {
     handlers[actionCreator.toString()] = handler;
@@ -23,12 +28,18 @@ export default function createReducer(handlers = {}, defaultState) {
     factory(on, off);
   }
 
+  if (!has(batch)) {
+    on(batch, (state, payload) => {
+      if (opts.payload) {
+        return payload.reduce(reduce, state);
+      } else {
+        return payload.payload.reduce(reduce, state);
+      }
+    });
+  }
+
   function reduce(state = defaultState, action) {
-    if (action[ID] === 0) {
-      // Batch action
-      // action.payload === array of actions
-      return action.payload.reduce(reduce, state);
-    } else if (action[ID] && handlers[action[ID]]) {
+    if (action[ID] && handlers[action[ID]]) {
       if (opts.payload) {
         return handlers[action[ID]](state, action.payload, action.meta);
       } else {
@@ -39,6 +50,7 @@ export default function createReducer(handlers = {}, defaultState) {
     }
   };
 
+  reduce.has = has;
   reduce.on = on;
   reduce.off = off;
   reduce.options = options;

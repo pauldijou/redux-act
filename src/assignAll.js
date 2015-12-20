@@ -1,10 +1,12 @@
 export default function assignAll(actions, stores) {
+  if (!actions || !stores) return;
+
   if (Array.isArray(actions)) {
-    return actions.map(action=> action.assignTo(stores));
+    return actions.map(action => action.assignTo(stores));
   } else {
-    return Object.keys(actions).reduce((binds, action) => {
-      binds[action] = actions[action].assignTo(stores);
-      return binds;
+    return Object.keys(actions).reduce((assigns, action) => {
+      assigns[action] = actions[action].assignTo(stores);
+      return assigns;
     }, {});
   }
 };

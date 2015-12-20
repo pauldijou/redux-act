@@ -87,10 +87,17 @@ export default function createAction(description, payloadReducer, metaReducer) {
     return actionCreator;
   };
 
+  actionCreator.assigned = () => !!dispatchFunctions;
+  actionCreator.binded = () => false;
+  actionCreator.dispatched = actionCreator.assigned;
+
   actionCreator.bindTo = (dispatchOrStores) => {
     const bindedActionCreator = makeAndDispatch(normalizeAll(dispatchOrStores));
     bindedActionCreator.toString = actionCreator.toString;
     bindedActionCreator.bindTo = () => bindedActionCreator;
+    bindedActionCreator.assigned = () => false;
+    bindedActionCreator.binded = () => true;
+    bindedActionCreator.dispatched = bindedActionCreator.binded;
     return bindedActionCreator;
   };
 

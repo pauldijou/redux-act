@@ -1,9 +1,8 @@
-import { ID } from './constants';
+import createAction from './createAction';
 
-export default function batch(actions) {
-  return {
-    [ID]: 0,
-    type: 'BATCH',
-    payload: actions
-  };
-}
+export default createAction('Batch', (...actions) => {
+  if (actions && actions.length === 1 && Array.isArray(actions[0])) {
+    return actions[0];
+  }
+  return (actions || []);
+});
