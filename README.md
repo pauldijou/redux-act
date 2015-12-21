@@ -377,13 +377,13 @@ store.dispatch(batch(inc(), inc(), dec(), inc()));
 store.dispatch(batch([inc(), inc(), dec(), inc()]));
 store.getState(); // 4
 
-// Binded actions
+// Assigned actions
 inc.assignTo(store);
 dec.assignTo(store);
 
 // You still need to dispatch the batch action
-// You will need to use the 'act' function on the action creators to prevent
-// the auto-dipatch from the binding
+// You will need to use the 'raw' function on the action creators to prevent
+// the auto-dipatch from the assigned action creators
 store.dispatch(batch(inc.raw(), dec.raw(), dec.raw()));
 store.dispatch(batch([inc.raw(), dec.raw(), dec.raw()]));
 store.getState(); // 2
@@ -452,8 +452,8 @@ Using the handlers object.
 const handlers = {};
 const reducer = createReducer(handlers, 0);
 const store = createStore(reducer);
-
 const increment = createAction().assignTo(store);
+
 handlers[increment] = (state) => state + 1;
 
 increment(); // store.getState() === 1
@@ -465,7 +465,7 @@ increment(); // store.getState() === 2
 increment(); // store.getState() === 2
 ```
 
-Using the 'on' and 'off' functions of the reducer. Those functions will be available whatever pattern you used to create the reducer.
+Using the `on` and `off` functions of the reducer. Those functions will be available whatever pattern you used to create the reducer.
 
 ```javascript
 const reducer = createReducer({}, 0);
@@ -483,10 +483,10 @@ increment(); // store.getState() === 2
 increment(); // store.getState() === 2
 ```
 
-Using the 'on' and 'off' functions of the function factory when creating the reducer.
+Using the `on` and `off` functions of the function factory when creating the reducer.
 
 ```javascript
-const store = createStore(()=> true));
+const store = createStore(()=> 0));
 const increment = createAction().assignTo(store);
 const reducer = createReducer(function (on, off) {
   on(increment, state => {
