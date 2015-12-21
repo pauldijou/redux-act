@@ -21,6 +21,7 @@ npm install redux-act --save
   - [batch](#batchactions)
   - [disbatch](#disbatchstore--dispatch-actions)
 - [Cookbook](#cookbook)
+  - [Adding and removing actions](#adding-and-removing-actions)
   - [Async actions](#async-actions)
   - [Enable or disable batch](#enable-or-disable-batch)
 
@@ -85,7 +86,7 @@ const [increment, decrement] = ['inc', 'dec'].map(createAction);
 // When creating action creators, the description is optional
 // it will only be used for devtools and logging stuff.
 // It's better to put something but feel free to leave it empty if you want to.
-let replace = createAction();
+const replace = createAction();
 
 // By default, the payload of the action is the first argument
 // when you call the action. If you need to support several arguments,
@@ -96,19 +97,19 @@ let append = createAction('optional description', (...args) => args.join(''));
 // There is another pattern to create reducers
 // and it works fine with ES5! (maybe even ES3 \o/)
 const stringReducer = createReducer(function (on) {
-  on(append, (state, payload) => state += payload);
   on(replace, (state, payload) => payload);
+  on(append, (state, payload) => state += payload);
   // Warning! If you use the same action twice,
   // the second one will override the previous one.
 }, 'missing a lette'); // <-- Default state
 
-// If you only have one global store,
-// or want to bind an action to one particular store,
-// rather than binding them in each component, you can do it
-// once you've created both the store and your actions
+// Rather than binding the action creators each time you want to use them,
+// you can do it once and for all as soon as you have the targeted store
+// assignTo: mutates the action creator itself
+// bindTo: returns a new action creator assigned to the store
 const stringStore = createStore(stringReducer);
-replace = append.assignTo(stringStore);
-append = replace.assignTo(stringStore);
+replace.assignTo(stringStore);
+append = append.bindTo(stringStore);
 
 // Now, when calling actions, they will be automatically dispatched
 append('r'); // stringStore.getState() === 'missing a letter'
@@ -154,7 +155,7 @@ const betterAction = createAction('This is better!');
 const multipleAction = createAction((text, checked) => ({text, checked}))
 // Again, better to add a description
 const bestAction = createAction('Best. Action. Ever.', (text, checked) => ({text, checked}))
-// Serializable action
+// Serializable action (the description will be used as the unique identifier)
 const serializableAction = createAction('SERIALIZABLE_ACTION');
 ```
 
@@ -256,7 +257,8 @@ const reducerMap = createReducer({
 const reducerFactory = createReducer(function (on, off) {
   on(increment, (state) => state + 1);
   on(add, (state, payload) => state + payload);
-  // See pro tip below for "off" usage
+  // 'off' remove support for a specific action
+  // See 'Adding and removing actions' section
 }, 0);
 ```
 
@@ -275,65 +277,20 @@ reducer.options({
 });
 ```
 
-**Pro Tip** You can dynamically add and remove actions. There are multiple patterns to do so.
+**Pro Tip** You can test if a reducer has a reduce function for a particular action creator using the `has` function.
 
 ```javascript
-// Adding and deleting properties from the handlers object
-const handlers = {};
-const reducer = createReducer(handlers, 0);
-const store = createStore(reducer);
-
-const increment = createAction().assignTo(store);
-handlers[increment] = (state) => state + 1;
-
-increment(); // store.getState() === 1
-increment(); // store.getState() === 2
-
-delete(handlers[increment]);
-
-increment(); // store.getState() === 2
-increment(); // store.getState() === 2
-
-// Using the 'on' and 'off' functions of the reducer
-// Those functions will be available whatever pattern
-// you used to create the reducer
-const reducer = createReducer({}, 0);
-const store = createStore(reducer);
-const increment = createAction().assignTo(store);
-
-reducer.on(increment, (state) => state + 1);
-
-increment(); // store.getState() === 1
-increment(); // store.getState() === 2
-
-reducer.off(increment);
-
-increment(); // store.getState() === 2
-increment(); // store.getState() === 2
-
-// Using the 'on' and 'off' functions of the function factory
-// when creating the reducer
-const store = createStore(()=> true));
-const increment = createAction().assignTo(store);
-const reducer = createReducer(function (on, off) {
-  on(increment, state => {
-    // Just for fun, we will disable increment when reaching 2
-    // (but we will still increment one last time)
-    if (state === 2) {
-      off(increment);
-    }
-    return state + 1;
-  });
+const add = createAction();
+const sub = createAction();
+const reducer = createReducer({
+  [add]: (state, action) => state + action.payload
 }, 0);
 
-store.replaceReducer(reducer);
-
-increment(); // store.getState() === 1
-increment(); // store.getState() === 2
-increment(); // store.getState() === 3
-increment(); // store.getState() === 3
-increment(); // store.getState() === 3
+reducer.has(add); // true
+reducer.has(sub); // false
 ```
+
+**Pro Tip** You can dynamically add and remove actions. There are [multiple patterns to do so](#adding-and-removing-actions).
 
 ### assignAll(actionCreators, stores)
 
@@ -466,35 +423,90 @@ store.getState(); // -1
 #### Usage
 
 ```javascript
+// All samples will display both syntax with and without an array
+// They are exactly the same
 import { disbatch } from 'redux-act';
 import { inc, dec } from './actions';
 
-// 1) Not using an array
-// Augment store
+// Add 'disbatch' directly to the store
 disbatch(store);
-store.disbatch(inc(), inc(), dec(), inc());
+store.disbatch(inc(), dec(), inc());
+store.disbatch([inc(), dec(), inc()]);
 
 // Disbatch immediately from store
-disbatch(store, inc(), inc(), dec(), inc());
+disbatch(store, inc(), dec(), inc());
+disbatch(store, [inc(), dec(), inc()]);
 
 // Disbatch immediately from dispatch
-disbatch(store.dispatch, inc(), inc(), dec(), inc());
-
-// 2) Using an array
-const actions = [inc(), inc(), dec(), inc()];
-
-// Augment store
-disbatch(store);
-store.disbatch(actions);
-
-// Disbatch immediately from store
-disbatch(store, actions);
-
-// Disbatch immediately from dispatch
-disbatch(store.dispatch, actions);
+disbatch(store.dispatch, inc(), dec(), inc());
+disbatch(store.dispatch, [inc(), dec(), inc()]);
 ```
 
 ## Cookbook
+
+### Adding and removing actions
+
+Using the handlers object.
+
+```javascript
+const handlers = {};
+const reducer = createReducer(handlers, 0);
+const store = createStore(reducer);
+
+const increment = createAction().assignTo(store);
+handlers[increment] = (state) => state + 1;
+
+increment(); // store.getState() === 1
+increment(); // store.getState() === 2
+
+delete(handlers[increment]);
+
+increment(); // store.getState() === 2
+increment(); // store.getState() === 2
+```
+
+Using the 'on' and 'off' functions of the reducer. Those functions will be available whatever pattern you used to create the reducer.
+
+```javascript
+const reducer = createReducer({}, 0);
+const store = createStore(reducer);
+const increment = createAction().assignTo(store);
+
+reducer.on(increment, (state) => state + 1);
+
+increment(); // store.getState() === 1
+increment(); // store.getState() === 2
+
+reducer.off(increment);
+
+increment(); // store.getState() === 2
+increment(); // store.getState() === 2
+```
+
+Using the 'on' and 'off' functions of the function factory when creating the reducer.
+
+```javascript
+const store = createStore(()=> true));
+const increment = createAction().assignTo(store);
+const reducer = createReducer(function (on, off) {
+  on(increment, state => {
+    // Just for fun, we will disable increment when reaching 2
+    // (but we will still increment one last time)
+    if (state === 2) {
+      off(increment);
+    }
+    return state + 1;
+  });
+}, 0);
+
+store.replaceReducer(reducer);
+
+increment(); // store.getState() === 1
+increment(); // store.getState() === 2
+increment(); // store.getState() === 3
+increment(); // store.getState() === 3
+increment(); // store.getState() === 3
+```
 
 ### Async actions
 

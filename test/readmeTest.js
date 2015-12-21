@@ -43,23 +43,24 @@ describe('README', function () {
     // when you call the action. If you need to support several arguments,
     // you can specify a function on how to merge all arguments into
     // an unique payload.
-    const append = createAction('optional description', (...args)=> args.join(''));
+    let append = createAction('optional description', (...args) => args.join(''));
 
     // There is another pattern to create reducers
+    // and it works fine with ES5! (maybe even ES3 \o/)
     const stringReducer = createReducer(function (on) {
-      on(append, (state, payload)=> state += payload);
-      on(replace, (state, payload)=> state = payload);
+      on(replace, (state, payload) => payload);
+      on(append, (state, payload) => state += payload);
       // Warning! If you use the same action twice,
       // the second one will override the previous one.
     }, 'missing a lette'); // <-- Default state
 
-    // If you only have one global store,
-    // or want to bind an action to one particular store,
-    // rather than binding them in each component, you can do it
-    // once you've created both the store and your actions
+    // Rather than binding the action creators each time you want to use them,
+    // you can do it once and for all as soon as you have the targeted store
+    // assignTo: mutates the action creator itself
+    // bindTo: returns a new action creator assigned to the store
     const stringStore = createStore(stringReducer);
-    append.assignTo(stringStore);
     replace.assignTo(stringStore);
+    append = append.bindTo(stringStore);
 
     // Now, when calling actions, they will be automatically dispatched
     append('r'); // stringStore.getState() === 'missing a letter'
@@ -249,6 +250,20 @@ describe('README', function () {
     expect(store.getState()).to.equal(3);
     increment(); // store.getState() === 3
     expect(store.getState()).to.equal(3);
+  });
+
+  it('should validate has sample', function () {
+    const add = createAction();
+    const sub = createAction();
+    const reducer = createReducer({
+      [add]: (state, action) => state + action.payload
+    }, 0);
+
+    reducer.has(add); // true
+    reducer.has(sub); // false
+
+    expect(reducer.has(add)).to.be.true;
+    expect(reducer.has(sub)).to.be.false;
   });
 
   it('should validate batch API', function () {
