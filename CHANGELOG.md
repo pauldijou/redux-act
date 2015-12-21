@@ -57,7 +57,7 @@ dispatch(batch(a1(), a2(), a3()));
 dispatch(batch([a1(), a2(), a3()]));
 ```
 
-:warning: **Warning** This does not work with binded or assigned action creators. They need to return an action object, not automatically dispatch it. If you are using those features (because, you know, they are awesome), you can call the `act` method to retrieve the action object directly without dispatching it.
+:warning: **Warning** This does not work with binded or assigned action creators. They need to return an action object, not automatically dispatch it. If you are using those features (because, you know, they are awesome), you can call the `raw` method to retrieve the action object directly without dispatching it.
 
 ```javascript
 // Assigned action creators
@@ -65,12 +65,12 @@ const a1 = createAction();
 const a2 = createAction();
 a1.assignTo(store);
 a2.assignTo(store);
-store.dispatch(batch(a1.act(), a2.act()));
+store.dispatch(batch(a1.raw(), a2.raw()));
 
 // Binded action creators
 const a1 = createAction().bindTo(store);
 const a2 = createAction().bindTo(store);
-store.dispatch(batch(a1.act(), a2.act()));
+store.dispatch(batch(a1.raw(), a2.raw()));
 ```
 
 You can do some other funny stuff, just because.

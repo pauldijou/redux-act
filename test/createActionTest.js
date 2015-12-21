@@ -371,15 +371,15 @@ describe('createAction', function () {
 
     testActionCreator(action);
     testAction(action(1), 1);
-    testAction(action.act(1), 1);
+    testAction(action.raw(1), 1);
     expect(store.getState()).to.equal(0);
 
     action.assignTo(store);
-    testAction(action.act(1), 1);
+    testAction(action.raw(1), 1);
     expect(store.getState()).to.equal(0);
 
     const bindedAction = action.bindTo(store);
-    testAction(bindedAction.act(1), 1);
+    testAction(bindedAction.raw(1), 1);
     expect(store.getState()).to.equal(0);
 
   });

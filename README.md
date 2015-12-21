@@ -393,7 +393,7 @@ export bindAll(actions, store);
 
 - **actions** (objects | array): wrap an array of actions inside another action and will reduce them all at once when dispatching it. You can also call this function with several actions as arguments.
 
-:warning: **Warning** Does not work with assigned and binded actions by default since those will be dispatched immediately when called. You will need to use the `act` method for such actions. See usage below.
+:warning: **Warning** Does not work with assigned and binded actions by default since those will be dispatched immediately when called. You will need to use the `raw` method for such actions. See usage below.
 
 ### Usage
 
@@ -427,8 +427,8 @@ dec.assignTo(store);
 // You still need to dispatch the batch action
 // You will need to use the 'act' function on the action creators to prevent
 // the auto-dipatch from the binding
-store.dispatch(batch(inc.act(), dec.act(), dec.act()));
-store.dispatch(batch([inc.act(), dec.act(), dec.act()]));
+store.dispatch(batch(inc.raw(), dec.raw(), dec.raw()));
+store.dispatch(batch([inc.raw(), dec.raw(), dec.raw()]));
 store.getState(); // 2
 
 // Let's de-assign our actions
@@ -436,8 +436,8 @@ inc.assignTo(undefined);
 dec.assignTo(undefined);
 
 // You can bind batch
-const bindedBatch = batch.bind(store);
-batch(inc(), inc());
+const bindedBatch = batch.bindTo(store);
+bindedBatch(inc(), inc());
 store.getState(); // 4
 
 // You can assign batch
