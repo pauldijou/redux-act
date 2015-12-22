@@ -138,13 +138,13 @@ createReducer({
 
 ### createAction([description], [payloadReducer], [metaReducer])
 
-#### Parameters
+**Parameters**
 
 - **description** (string, optional): used by logging and devtools when displaying the action. If this parameter is uppercase only, with underscores, it will used as the id and type of the action rather than the generated id. You can use this feature to have serializable actions you can share between client and server.
 - **payloadReducer** (function, optional): transform multiple arguments as a unique payload.
 - **metaReducer** (function, optional): transform multiple arguments as a unique metadata object.
 
-#### Usage
+**Usage**
 
 Returns a new [action creator](#action-creator). If you specify a description, it will be used by devtools. By default, `createAction` will return a function and its first argument will be used as the payload when dispatching the action. If you need to support multiple arguments, you need to specify a **payload reducer** in order to merge all arguments into one unique payload.
 
@@ -186,7 +186,7 @@ serializeTodo(1);
 
 An action creator has the following methods:
 
-#### assignTo(store | dispatch)
+**assignTo(store | dispatch)**
 
 Remember that you still need to dispatch those actions. If you already have one or more stores, you can assign the action using the `assignTo` function. This will mutate the action creator itself. You can pass one store or one dispatch function or an array of any of both.
 
@@ -213,7 +213,7 @@ action();
 // store2.getState() === -2
 ```
 
-#### bindTo(store | dispatch)
+**bindTo(store | dispatch)**
 
 If you need immutability, you can use `bindTo`, it will return a new action creator which will automatically dispatch its action.
 
@@ -226,7 +226,7 @@ action2(); // Not doing anything since not assigned nor binded
 bindedAction(); // store.getState() === 8
 ```
 
-#### assigned() / binded() / dispatched()
+**assigned() / binded() / dispatched()**
 
 Test the current status of the action creator.
 
@@ -247,7 +247,7 @@ action.binded(); // false
 action.dispatched(); // true
 ```
 
-#### raw(...args)
+**raw(...args)**
 
 When an action creator is either assigned or binded, it will no longer only return the action object but also dispatch it. In some cases, you will need the action without dispatching it (when batching actions for example). In order to achieve that, you can use the `raw` method which will return the bare action. You could say that it is exactly the same as the action creator would behave it if wasn't assigned nor binded.
 
@@ -259,12 +259,12 @@ action.raw(1); // return the action, store hasn't been updated
 
 ### createReducer(handlers, [defaultState])
 
-#### Parameters
+**Parameters**
 
 - **handlers** (object or function): if `object`, a map of action to the reduce function. If `function`, take two attributes: a function to register actions and another one to unregister them. See below.
 - **defaultState** (anything, optional): the initial state of the reducer. Must not be empty if you plan to use this reducer inside a `combineReducers`.
 
-#### Usage
+**Usage**
 
 Returns a new [reducer](#reducer). It's kind of the same syntax as the `Array.prototype.reduce` function. You can specify how to reduce as the first argument and the accumulator, or default state, as the second one. The default state is optional since you can retrieve it from the store when creating it but you should consider always having a default state inside a reducer, especially if you want to use it with `combineReducers` which make such default state mandatory.
 
@@ -293,7 +293,7 @@ const reducerFactory = createReducer(function (on, off) {
 
 Like everything, a reducer is just a function. It takes the current state and an action payload and return the new state. It has the following methods.
 
-#### options(object)
+**options(object)**
 
 Since an action is an object with some private stuff (`__id__` and `type`), a `payload` (which is your actual data) and eventually some `metadata`, all reduce functions directly take the payload as their 2nd argument and the metadata as the 3rd by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
 
@@ -310,7 +310,7 @@ reducer.options({
 });
 ```
 
-#### has(action creator)
+**has(action creator)**
 
 Test if the reducer has a reduce function for a particular action creator.
 
@@ -325,18 +325,18 @@ reducer.has(add); // true
 reducer.has(sub); // false
 ```
 
-#### on(action creator, reduce function) / off(action creator)
+**on(action creator, reduce function) / off(action creator)**
 
 You can dynamically add and remove actions. See the [adding and removing actions](#adding-and-removing-actions) section for more infos.
 
 ### assignAll(actionCreators, stores)
 
-#### Parameters
+**Parameters**
 
 - **actionCreators** (object or array): which action creators to assign. If it's an object, it's a map of name -> action creator, useful when importing several actions at once.
 - **stores** (object or array): the target store(s) when dispatching actions. Can be only one or several inside an array.
 
-#### Usage
+**Usage**
 
 A common pattern is to export a set of action creators as an object. If you want to bind all of them to a store, there is this super small helper. You can also use an array of action creators. And since you can bind to one or several stores, you can specify either one store or an array of stores.
 
@@ -364,12 +364,12 @@ export default store;
 
 ### bindAll(actionCreators, stores)
 
-#### Parameters
+**Parameters**
 
 - **actionCreators** (object or array): which action creators to bind. If it's an object, it's a map of name -> action creator, useful when importing several actions at once.
 - **stores** (object or array): the target store(s) when dispatching actions. Can be only one or several inside an array.
 
-#### Usage
+**Usage**
 
 Just like `assignAll`, you can bind several action creators at once.
 
@@ -383,13 +383,13 @@ export bindAll(actions, store);
 
 ### batch(actions)
 
-#### Parameters
+**Parameters**
 
 - **actions** (objects | array): wrap an array of actions inside another action and will reduce them all at once when dispatching it. You can also call this function with several actions as arguments.
 
 :warning: **Warning** Does not work with assigned and binded actions by default since those will be dispatched immediately when called. You will need to use the `raw` method for such actions. See usage below.
 
-### Usage
+**Usage**
 
 Useful when you need to run a sequence of actions without impacting your whole application after each one but rather after all of them are done. For example, if you are using `@connect` from `react-redux`, it is called after each action by default. Using `batch`, it will be called only when all actions in the array have been reduced.
 
@@ -452,12 +452,12 @@ store.getState(); // -1
 
 ### disbatch(store | dispatch, [actions])
 
-#### Parameters
+**Parameters**
 
 - **store | dispatch** (object, which is a Redux store, or a dispatch function): add a `disbatch` function to the store if it is the only parameter. Just like `dispatch` but for several actions which will be batched as a single one.
 - **actions** (array, optional): the array of actions to dispatch as a batch of actions.
 
-#### Usage
+**Usage**
 
 ```javascript
 // All samples will display both syntax with and without an array
