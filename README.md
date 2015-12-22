@@ -15,7 +15,9 @@ npm install redux-act --save
 - [Advanced usage](#advanced-usage)
 - [API](#api)
   - [createAction](#createactiondescription-payloadreducer-metareducer)
+  - [action creator](#action-creator)
   - [createReducer](#createreducerhandlers-defaultstate)
+  - [reducer](#reducer)
   - [assignAll](#assignallactioncreators-stores)
   - [bindAll](#bindallactioncreators-stores)
   - [batch](#batchactions)
@@ -144,7 +146,7 @@ createReducer({
 
 #### Usage
 
-Create a new action creator. If you specify a description, it will be used by devtools. By default, `createAction` will return a function and its first argument will be used as the payload when dispatching the action. If you need to support multiple arguments, you need to specify a **payload reducer** in order to merge all arguments into one unique payload.
+Returns a new [action creator](#action-creator). If you specify a description, it will be used by devtools. By default, `createAction` will return a function and its first argument will be used as the payload when dispatching the action. If you need to support multiple arguments, you need to specify a **payload reducer** in order to merge all arguments into one unique payload.
 
 ```javascript
 // Super simple action
@@ -159,7 +161,9 @@ const bestAction = createAction('Best. Action. Ever.', (text, checked) => ({text
 const serializableAction = createAction('SERIALIZABLE_ACTION');
 ```
 
-When calling an action creator, the returned object will have the following properties:
+### action creator
+
+An action creator is basically a function that takes arguments and return an action which has the following format:
 
 - `__id__`: a generated id. Used by the reducers. Don't touch it.
 - `type`: totally useless for you, but provide support for devtools.
@@ -180,7 +184,11 @@ serializeTodo(1);
 // return { __id__: 'SERIALIZE_TODO', type: 'SERIALIZE_TODO', payload: 1 }
 ```
 
-Remember that you still need to dispatch those actions. If you already have one or more stores, you can assign the action using the `assignTo` function. This will mutate the action creator itself. If you need immutability, you can use `bindTo`, it will return a new action creator function which will automatically dispatch its action.
+An action creator has the following methods:
+
+#### assignTo(store | dispatch)
+
+Remember that you still need to dispatch those actions. If you already have one or more stores, you can assign the action using the `assignTo` function. This will mutate the action creator itself. You can pass one store or one dispatch function or an array of any of both.
 
 ```javascript
 let action = createAction();
@@ -203,23 +211,32 @@ action.assignTo([store, store2]);
 action();
 // store.getState() === 16
 // store2.getState() === -2
+```
 
-// You can un-assign
-action.assignTo(undefined);
-action(); // store.getState() === 16
+#### bindTo(store | dispatch)
 
+If you need immutability, you can use `bindTo`, it will return a new action creator which will automatically dispatch its action.
+
+```javascript
 // If you need more immutability, you can bind them, creating a new action creator
 const bindedAction = action2.bindTo(store);
 action2(); // Not doing anything since not assigned nor binded
 // store.getState() === 16
 // store2.getState() === -2
 bindedAction(); // store.getState() === 8
+```
 
-// You can test the status of your action creator
-action.assigned(); // false, not assigned anymore
+#### assigned() / binded() / dispatched()
+
+Test the current status of the action creator.
+
+```javascript
+const action = createAction();
+action.assigned(); // false, not assigned
 action.binded(); // false, not binded
 action.dispatched(); // false, test if either assigned or binded
 
+const bindedAction = action.bindTo(store);
 bindedAction.assigned(); // false
 bindedAction.binded(); // true
 bindedAction.dispatched(); // true
@@ -228,6 +245,16 @@ action.assignTo(store);
 action.assigned(); // true
 action.binded(); // false
 action.dispatched(); // true
+```
+
+#### raw(...args)
+
+When an action creator is either assigned or binded, it will no longer only return the action object but also dispatch it. In some cases, you will need the action without dispatching it (when batching actions for example). In order to achieve that, you can use the `raw` method which will return the bare action. You could say that it is exactly the same as the action creator would behave it if wasn't assigned nor binded.
+
+```javascript
+const action = createAction().bindTo(store);
+action(1); // store has been updated
+action.raw(1); // return the action, store hasn't been updated
 ```
 
 ### createReducer(handlers, [defaultState])
@@ -239,7 +266,7 @@ action.dispatched(); // true
 
 #### Usage
 
-It's kind of the same syntax as the `Array.prototype.reduce` function. You can specify how to reduce as the first argument and the accumulator, or default state, as the second one. The default state is optional since you can retrieve it from the store when creating it but you should consider always having a default state inside a reducer, especially if you want to use it with `combineReducers` which make such default state mandatory.
+Returns a new [reducer](#reducer). It's kind of the same syntax as the `Array.prototype.reduce` function. You can specify how to reduce as the first argument and the accumulator, or default state, as the second one. The default state is optional since you can retrieve it from the store when creating it but you should consider always having a default state inside a reducer, especially if you want to use it with `combineReducers` which make such default state mandatory.
 
 There are two patterns to create a reducer. One is passing an object as a map of `action creators` to `reduce functions`. Such functions have the following signature: `(previousState, payload) => newState`. The other one is using a function factory. Rather than trying to explaining it, just read the following examples.
 
@@ -262,7 +289,13 @@ const reducerFactory = createReducer(function (on, off) {
 }, 0);
 ```
 
-Since an action is an object with some metadata (`__id__` and `type`) and a `payload` (which is your actual data), all reduce functions directly take the payload as their 2nd argument by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
+### reducer
+
+Like everything, a reducer is just a function. It takes the current state and an action payload and return the new state. It has the following methods.
+
+#### options(object)
+
+Since an action is an object with some private stuff (`__id__` and `type`), a `payload` (which is your actual data) and eventually some `metadata`, all reduce functions directly take the payload as their 2nd argument and the metadata as the 3rd by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
 
 ```javascript
 const add = createAction();
@@ -277,7 +310,9 @@ reducer.options({
 });
 ```
 
-**Pro Tip** You can test if a reducer has a reduce function for a particular action creator using the `has` function.
+#### has(action creator)
+
+Test if the reducer has a reduce function for a particular action creator.
 
 ```javascript
 const add = createAction();
@@ -290,7 +325,9 @@ reducer.has(add); // true
 reducer.has(sub); // false
 ```
 
-**Pro Tip** You can dynamically add and remove actions. There are [multiple patterns to do so](#adding-and-removing-actions).
+#### on(action creator, reduce function) / off(action creator)
+
+You can dynamically add and remove actions. See the [adding and removing actions](#adding-and-removing-actions) section for more infos.
 
 ### assignAll(actionCreators, stores)
 
