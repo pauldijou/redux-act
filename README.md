@@ -38,8 +38,8 @@ import { createAction, createReducer } from 'redux-act';
 
 // Create an action creator (description is optional)
 const add = createAction('add some stuff');
-const inc = createAction('increment the state');
-const dec = createAction('decrement the state');
+const increment = createAction('increment the state');
+const decrement = createAction('decrement the state');
 
 // Create a reducer
 // (ES6 syntax, see Advanced usage below for an alternative for ES5)
