@@ -1,4 +1,3 @@
-import { ID } from './constants';
 import batch from './batch';
 
 export default function createReducer(handlers = {}, defaultState) {
@@ -39,11 +38,11 @@ export default function createReducer(handlers = {}, defaultState) {
   }
 
   function reduce(state = defaultState, action) {
-    if (action[ID] && handlers[action[ID]]) {
+    if (action.type && handlers[action.type]) {
       if (opts.payload) {
-        return handlers[action[ID]](state, action.payload, action.meta);
+        return handlers[action.type](state, action.payload, action.meta);
       } else {
-        return handlers[action[ID]](state, action);
+        return handlers[action.type](state, action);
       }
     } else {
       return state;
