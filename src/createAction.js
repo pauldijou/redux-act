@@ -87,20 +87,32 @@ export default function createAction(description, payloadReducer, metaReducer) {
   };
 
   actionCreator.assigned = () => !!dispatchFunctions;
-  actionCreator.binded = () => false;
+  actionCreator.bound = () => false;
+  actionCreator.binded = () => {
+    if (console && console.warn) {
+      console.warn('"binded" method is deprecated. It has been renamed to "bound" to fix a typo');
+    }
+    return false;
+  };
   actionCreator.dispatched = actionCreator.assigned;
 
   actionCreator.bindTo = (dispatchOrStores) => {
-    const bindedActionCreator = makeAndDispatch(normalizeAll(dispatchOrStores));
-    bindedActionCreator.raw = makeAction;
-    bindedActionCreator.getType = actionCreator.getType;
-    bindedActionCreator.toString = actionCreator.toString;
-    bindedActionCreator.assignTo = () => bindedActionCreator;
-    bindedActionCreator.bindTo = () => bindedActionCreator;
-    bindedActionCreator.assigned = () => false;
-    bindedActionCreator.binded = () => true;
-    bindedActionCreator.dispatched = bindedActionCreator.binded;
-    return bindedActionCreator;
+    const boundActionCreator = makeAndDispatch(normalizeAll(dispatchOrStores));
+    boundActionCreator.raw = makeAction;
+    boundActionCreator.getType = actionCreator.getType;
+    boundActionCreator.toString = actionCreator.toString;
+    boundActionCreator.assignTo = () => boundActionCreator;
+    boundActionCreator.bindTo = () => boundActionCreator;
+    boundActionCreator.assigned = () => false;
+    boundActionCreator.bound = () => true;
+    boundActionCreator.binded = () => {
+      if (console && console.warn) {
+        console.warn('"binded" method is deprecated. It has been renamed to "bound" to fix a typo');
+      }
+      return true;
+    };
+    boundActionCreator.dispatched = boundActionCreator.bound;
+    return boundActionCreator;
   };
 
   return actionCreator;

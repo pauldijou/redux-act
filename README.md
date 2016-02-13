@@ -225,37 +225,37 @@ If you need immutability, you can use `bindTo`, it will return a new action crea
 
 ```javascript
 // If you need more immutability, you can bind them, creating a new action creator
-const bindedAction = action2.bindTo(store);
-action2(); // Not doing anything since not assigned nor binded
+const boundAction = action2.bindTo(store);
+action2(); // Not doing anything since not assigned nor bound
 // store.getState() === 16
 // store2.getState() === -2
-bindedAction(); // store.getState() === 8
+boundAction(); // store.getState() === 8
 ```
 
-**assigned() / binded() / dispatched()**
+**assigned() / bound() / dispatched()**
 
 Test the current status of the action creator.
 
 ```javascript
 const action = createAction();
 action.assigned(); // false, not assigned
-action.binded(); // false, not binded
-action.dispatched(); // false, test if either assigned or binded
+action.bound(); // false, not bound
+action.dispatched(); // false, test if either assigned or bound
 
-const bindedAction = action.bindTo(store);
-bindedAction.assigned(); // false
-bindedAction.binded(); // true
-bindedAction.dispatched(); // true
+const boundAction = action.bindTo(store);
+boundAction.assigned(); // false
+boundAction.bound(); // true
+boundAction.dispatched(); // true
 
 action.assignTo(store);
 action.assigned(); // true
-action.binded(); // false
+action.bound(); // false
 action.dispatched(); // true
 ```
 
 **raw(...args)**
 
-When an action creator is either assigned or binded, it will no longer only return the action object but also dispatch it. In some cases, you will need the action without dispatching it (when batching actions for example). In order to achieve that, you can use the `raw` method which will return the bare action. You could say that it is exactly the same as the action creator would behave it if wasn't assigned nor binded.
+When an action creator is either assigned or bound, it will no longer only return the action object but also dispatch it. In some cases, you will need the action without dispatching it (when batching actions for example). In order to achieve that, you can use the `raw` method which will return the bare action. You could say that it is exactly the same as the action creator would behave it if wasn't assigned nor bound.
 
 ```javascript
 const action = createAction().bindTo(store);
@@ -394,7 +394,7 @@ export bindAll(actions, store);
 
 - **actions** (objects | array): wrap an array of actions inside another action and will reduce them all at once when dispatching it. You can also call this function with several actions as arguments.
 
-:warning: **Warning** Does not work with assigned and binded actions by default since those will be dispatched immediately when called. You will need to use the `raw` method for such actions. See usage below.
+:warning: **Warning** Does not work with assigned and bound actions by default since those will be dispatched immediately when called. You will need to use the `raw` method for such actions. See usage below.
 
 **Usage**
 
@@ -437,8 +437,8 @@ inc.assignTo(undefined);
 dec.assignTo(undefined);
 
 // You can bind batch
-const bindedBatch = batch.bindTo(store);
-bindedBatch(inc(), inc());
+const boundBatch = batch.bindTo(store);
+boundBatch(inc(), inc());
 store.getState(); // 4
 
 // You can assign batch

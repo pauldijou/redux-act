@@ -124,36 +124,36 @@ describe('README', function () {
     expect(store.getState()).to.equal(16);
 
     // If you need more immutability, you can bind them, creating a new action creator
-    const bindedAction = action2.bindTo(store);
-    action2(); // Not doing anything since not assigned nor binded
+    const boundAction = action2.bindTo(store);
+    action2(); // Not doing anything since not assigned nor bound
     // store.getState() === 16
     expect(store.getState()).to.equal(16);
     // store2.getState() === -2
     expect(store2.getState()).to.equal(-2);
-    bindedAction(); // store.getState() === 8
+    boundAction(); // store.getState() === 8
     expect(store.getState()).to.equal(8);
 
     // You can test the status of your action creator
     action.assigned(); // false, not assigned anymore
-    action.binded(); // false, not binded
-    action.dispatched(); // false, test if either assigned or binded
+    action.bound(); // false, not bound
+    action.dispatched(); // false, test if either assigned or bound
     expect(action.assigned()).to.be.false;
-    expect(action.binded()).to.be.false;
+    expect(action.bound()).to.be.false;
     expect(action.dispatched()).to.be.false;
 
-    bindedAction.assigned(); // false
-    bindedAction.binded(); // true
-    bindedAction.dispatched(); // true
-    expect(bindedAction.assigned()).to.be.false;
-    expect(bindedAction.binded()).to.be.true;
-    expect(bindedAction.dispatched()).to.be.true;
+    boundAction.assigned(); // false
+    boundAction.bound(); // true
+    boundAction.dispatched(); // true
+    expect(boundAction.assigned()).to.be.false;
+    expect(boundAction.bound()).to.be.true;
+    expect(boundAction.dispatched()).to.be.true;
 
     action.assignTo(store);
     action.assigned(); // true
-    action.binded(); // false
+    action.bound(); // false
     action.dispatched(); // true
     expect(action.assigned()).to.be.true;
-    expect(action.binded()).to.be.false;
+    expect(action.bound()).to.be.false;
     expect(action.dispatched()).to.be.true;
   });
 
@@ -282,7 +282,7 @@ describe('README', function () {
     store.getState(); // 4
     expect(store.getState()).to.equal(4);
 
-    // Binded actions
+    // bound actions
     inc.assignTo(store);
     dec.assignTo(store);
 
@@ -299,8 +299,8 @@ describe('README', function () {
     dec.assignTo(undefined);
 
     // You can bind batch
-    const bindedBatch = batch.bindTo(store);
-    bindedBatch(inc(), inc());
+    const boundBatch = batch.bindTo(store);
+    boundBatch(inc(), inc());
     store.getState(); // 4
     expect(store.getState()).to.equal(4);
 

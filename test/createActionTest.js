@@ -333,26 +333,26 @@ describe('createAction', function () {
     const store = createStore(() => 0);
     const action = createAction();
     expect(action.assigned()).to.be.false;
-    expect(action.binded()).to.be.false;
+    expect(action.bound()).to.be.false;
     expect(action.dispatched()).to.be.false;
 
     action.assignTo(store);
     expect(action.assigned()).to.be.true;
-    expect(action.binded()).to.be.false;
+    expect(action.bound()).to.be.false;
     expect(action.dispatched()).to.be.true;
 
-    const bindedAction = action.bindTo(store);
-    expect(bindedAction.assigned()).to.be.false;
-    expect(bindedAction.binded()).to.be.true;
-    expect(bindedAction.dispatched()).to.be.true;
+    const boundAction = action.bindTo(store);
+    expect(boundAction.assigned()).to.be.false;
+    expect(boundAction.bound()).to.be.true;
+    expect(boundAction.dispatched()).to.be.true;
 
     action.assignTo(undefined);
     expect(action.assigned()).to.be.false;
-    expect(action.binded()).to.be.false;
+    expect(action.bound()).to.be.false;
     expect(action.dispatched()).to.be.false;
   });
 
-  it('should not be assignable nor bindable once binded', function () {
+  it('should not be assignable nor bindable once bound', function () {
     const store = createStore(() => 0);
     const action = createAction().bindTo(store);
     expect(action).to.equal(action.assignTo(store));
@@ -375,8 +375,8 @@ describe('createAction', function () {
     testAction(action.raw(1), 1);
     expect(store.getState()).to.equal(0);
 
-    const bindedAction = action.bindTo(store);
-    testAction(bindedAction.raw(1), 1);
+    const boundAction = action.bindTo(store);
+    testAction(boundAction.raw(1), 1);
     expect(store.getState()).to.equal(0);
 
   });

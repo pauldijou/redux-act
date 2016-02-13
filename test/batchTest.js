@@ -104,10 +104,10 @@ describe('batch', function () {
 
   it('should be bindable', function () {
     const { inc, dec, reducer, store, spy } = init();
-    const bindedBatch = batch.bindTo(store);
+    const boundBatch = batch.bindTo(store);
     expect(store.getState()).to.equal(0);
     expect(spy).to.have.been.called.exactly(0);
-    bindedBatch(inc(), inc(), dec());
+    boundBatch(inc(), inc(), dec());
     expect(store.getState()).to.equal(1);
     expect(spy).to.have.been.called.exactly(1);
   });
