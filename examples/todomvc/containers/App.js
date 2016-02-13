@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import TodoApp from './TodoApp';
 import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 import { Provider } from 'react-redux';
-import { assignAll } from 'redux-act';
+import { assignAll, batch } from 'redux-act';
 import configureStore from '../store/configureStore';
 import * as todoActions from '../actions/TodoActions';
 
@@ -12,6 +12,7 @@ const store = configureStore();
 // to the unique store but feel free to bind them inside
 // the components if you prefer so
 assignAll(todoActions, store);
+batch.assignTo(store);
 
 export default class App extends Component {
   render() {

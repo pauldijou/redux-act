@@ -26,6 +26,8 @@ npm install redux-act --save
   - [Adding and removing actions](#adding-and-removing-actions)
   - [Async actions](#async-actions)
   - [Enable or disable batch](#enable-or-disable-batch)
+- [Loggers](#loggers)
+  - [Redux Logger](#redux-logger)
 
 ## Usage
 
@@ -640,6 +642,36 @@ reducer.on(batch, (state, payload) => payload.reduce(reducer, state));
 // Be careful if 'payload' option is false
 reducer.options({ payload: false });
 reducer.on(batch, (state, action) => action.payload.reduce(reducer, state));
+```
+
+## Loggers
+
+`redux-act` provides improved logging with some loggers, mostly for batched actions.
+
+Missing your favorite one? Please open an issue or a pull request, it will be added as soon as possible.
+
+### [Redux Logger](https://github.com/fcomb/redux-logger)
+
+```
+import { applyMiddleware, createStore } from 'redux';
+import createLogger from 'redux-logger';
+import { loggers } from 'redux-act';
+
+// Init logger
+const logger = createLogger({
+  ...loggers.reduxLogger,
+  // You can  add you own options after that
+});
+
+// Same as
+const logger = createLogger({
+  actionTransformer: loggers.reduxLogger.actionTransformer,
+  logger: loggers.reduxLogger.logger,
+  // You can  add you own options after that
+});
+
+// Create the store
+const store = applyMiddleware(logger)(createStore)(/* reducer */);
 ```
 
 ## Thanks

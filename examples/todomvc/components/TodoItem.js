@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
 import classnames from 'classnames';
 import TodoTextInput from './TodoTextInput';
+// Hack to test batched actions
+import { batch } from 'redux-act';
 
 export default class TodoItem extends Component {
   static propTypes = {
@@ -46,7 +48,7 @@ export default class TodoItem extends Component {
           <input className='toggle'
                  type='checkbox'
                  checked={todo.marked}
-                 onChange={() => markTodo(todo.id)} />
+                 onChange={() => batch([markTodo.raw(todo.id), markTodo.raw(todo.id), markTodo.raw(todo.id)])} />
           <label onDoubleClick={::this.handleDoubleClick}>
             {todo.text}
           </label>

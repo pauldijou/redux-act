@@ -32,6 +32,7 @@
     "mocha": "^2.2.5",
     "mocha-better-spec-reporter": "^2.1.0",
     "redux": "^3.0.0",
+    "redux-logger": "^2.4.0",
     "redux-thunk": "^1.0.0",
     "rimraf": "^2.4.2"
   },
@@ -39,7 +40,7 @@
     "clean": "rimraf lib",
     "build": "babel src --out-dir lib",
     "prepublish": "npm run clean && npm run build",
-    "test": "NODE_ENV=test mocha --compilers js:babel/register --reporter mocha-better-spec-reporter",
+    "test": "NODE_ENV=test mocha --recursive --compilers js:babel/register --reporter mocha-better-spec-reporter",
     "coverage": "babel-node ./node_modules/.bin/isparta cover ./node_modules/.bin/_mocha -- --recursive --reporter mocha-better-spec-reporter"
   }
 }
