@@ -1,3 +1,21 @@
+# 0.4.0
+
+So, it wasn't the last release before 1.0 after all...
+
+## :warning: Breaking changes
+
+They shouldn't actually break your app because they are well hidden but I need to mention them. Before, the generated id was placed in both a "private" property `__id__` and the `type` property (with the optional description appended to it). I did that to maximize safety when checking the id and to boost performance because comparing numbers is blazing fast.
+
+After a lot of thoughts, it wasn't worth it. It's blocking compatibility with other Redux libs and do not rely on the type anymore like it should regarding Redux document. So in this release, `redux-act` is dropping the `__id__` property and will only rely on the `type`. Since the id is still put in there, it will not clash, not even with non-redux-act actions (except if you have crazy types like `const TYPE = '[42] Whatever, yolo'`). See [the compatibility section](https://github.com/pauldijou/redux-act#compatibility) for more infos.
+
+## Fix typo
+
+Because I'm not that good in English, I wrote `binded` instead of `bound` (thanks @appsforartists). The method has been renamed. The wrong one will be deprecated with a warning and remove in the 1.0.
+
+## Loggers
+
+I started working a better logger support for `redux-act` actions, especially batch actions. Check [the loggers section](https://github.com/pauldijou/redux-act#loggers) for more infos. Only Redux Logger is supported right now, but you can open an issue or submit a pull request to ask for any other logger.
+
 # 0.3.0
 
 This is probably the last release before 1.0. Just want to battle test it in production before freezing the API.
