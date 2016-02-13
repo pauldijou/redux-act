@@ -257,4 +257,62 @@ describe('createReducer', function () {
     expect(reducer.has(a2)).to.be.true;
     expect(reducer.has(batch)).to.be.true;
   });
+
+  it('should be compatible', function () {
+    const TYPE = 'TYPE';
+    const a1 = () => ({ type: TYPE });
+    const a2 = createAction();
+
+    const reducer1 = createReducer({
+      [TYPE]: () => 1,
+      [a2]: () => 2,
+    }, 0);
+
+    const reducer2 = createReducer((on, off) => {
+      on(TYPE, () => 1);
+      on(a2, () => 2);
+    }, 0);
+
+    function reducer3(state = 0, action) {
+      switch (action.type) {
+      case TYPE:
+        return 1;
+        break;
+      case a2.getType():
+        return 2;
+        break;
+      default:
+        return state;
+      }
+    }
+
+    const store = createStore(combineReducers({
+      one: reducer1,
+      two: reducer2,
+      three: reducer3,
+    }));
+
+    expect(reducer1.has(TYPE)).to.be.true;
+    expect(reducer1.has(a2)).to.be.true;
+    expect(reducer2.has(TYPE)).to.be.true;
+    expect(reducer2.has(a2)).to.be.true;
+
+    expect(store.getState()).to.deep.equal({ one: 0, two: 0, three: 0 });
+    store.dispatch(a1());
+    expect(store.getState()).to.deep.equal({ one: 1, two: 1, three: 1 });
+    store.dispatch(a1());
+    expect(store.getState()).to.deep.equal({ one: 1, two: 1, three: 1 });
+    store.dispatch(a2());
+    expect(store.getState()).to.deep.equal({ one: 2, two: 2, three: 2 });
+
+    reducer1.off(TYPE);
+    reducer2.off(TYPE);
+    store.dispatch(a1());
+    expect(store.getState()).to.deep.equal({ one: 2, two: 2, three: 1 });
+
+    reducer1.on(TYPE, () => 3);
+    reducer2.on(TYPE, () => 3);
+    store.dispatch(a1());
+    expect(store.getState()).to.deep.equal({ one: 3, two: 3, three: 1 });
+  });
 });

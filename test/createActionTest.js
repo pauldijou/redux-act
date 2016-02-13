@@ -2,7 +2,6 @@ import chai from 'chai';
 import {createStore, applyMiddleware} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import {createAction, createReducer} from '../src/index';
-import { ID } from '../src/constants';
 const expect = chai.expect;
 
 describe('createAction', function () {
@@ -16,8 +15,7 @@ describe('createAction', function () {
 
   function testAction(action, payload, description, meta) {
     expect(action).to.be.an('object');
-    expect(action).to.contain.keys(ID, 'type', 'payload', 'meta');
-    expect(action[ID]).to.be.a('number');
+    expect(action).to.contain.keys('type', 'payload', 'meta');
     expect(action.type).to.be.a('string');
     if (typeof description === 'string') {
       expect(action.type).to.contain(description);
@@ -30,8 +28,7 @@ describe('createAction', function () {
 
   function testSerializableAction(action, description, payload, meta) {
     expect(action).to.be.an('object');
-    expect(action).to.contain.keys(ID, 'type', 'payload', 'meta');
-    expect(action[ID]).to.equal(description);
+    expect(action).to.contain.keys('type', 'payload', 'meta');
     expect(action.type).to.equal(description);
     expect(action.payload).to.deep.equal(payload);
     if (typeof meta !== 'undefined') {

@@ -1,5 +1,3 @@
-import { ID } from './constants';
-
 let id = 0;
 
 const types = {}
@@ -47,19 +45,17 @@ export default function createAction(description, payloadReducer, metaReducer) {
     }
 
     types[description] = true;
+  } else {
+    ++id;
   }
 
-  const action = {
-    id: isSerializable ? description : ++id,
-    type: isSerializable ? description : `[${id}]${description ? ' ' + description : ''}`
-  };
+  const type = isSerializable ? description : `[${id}]${description ? ' ' + description : ''}`
 
   let dispatchFunctions = undefined;
 
   function makeAction(...args) {
     return {
-      [ID]: action.id,
-      type: action.type,
+      type: type,
       payload: payloadReducer(...args),
       meta: metaReducer(...args)
     };
@@ -80,7 +76,8 @@ export default function createAction(description, payloadReducer, metaReducer) {
     return makeAndDispatch(dispatchFunctions)(...args);
   }
 
-  actionCreator.toString = () => action.id;
+  actionCreator.getType = () => type;
+  actionCreator.toString = () => type;
 
   actionCreator.raw = makeAction;
 
@@ -96,6 +93,7 @@ export default function createAction(description, payloadReducer, metaReducer) {
   actionCreator.bindTo = (dispatchOrStores) => {
     const bindedActionCreator = makeAndDispatch(normalizeAll(dispatchOrStores));
     bindedActionCreator.raw = makeAction;
+    bindedActionCreator.getType = actionCreator.getType;
     bindedActionCreator.toString = actionCreator.toString;
     bindedActionCreator.assignTo = () => bindedActionCreator;
     bindedActionCreator.bindTo = () => bindedActionCreator;

@@ -1,21 +1,27 @@
-import { ID } from './constants';
 import batch from './batch';
+
+function normalizeType(typeOrActionCreator) {
+  if (typeOrActionCreator && typeOrActionCreator.getType) {
+    return typeOrActionCreator.toString();
+  }
+  return typeOrActionCreator;
+}
 
 export default function createReducer(handlers = {}, defaultState) {
   let opts = {
     payload: true
   };
 
-  function has(actionCreator) {
-    return !!handlers[actionCreator.toString()];
+  function has(typeOrActionCreator) {
+    return !!handlers[normalizeType(typeOrActionCreator)];
   }
 
-  function on(actionCreator, handler) {
-    handlers[actionCreator.toString()] = handler;
+  function on(typeOrActionCreator, handler) {
+    handlers[normalizeType(typeOrActionCreator)] = handler;
   }
 
-  function off(actionCreator) {
-    delete handlers[actionCreator.toString()];
+  function off(typeOrActionCreator) {
+    delete handlers[normalizeType(typeOrActionCreator)];
   }
 
   function options(newOpts) {
@@ -39,11 +45,11 @@ export default function createReducer(handlers = {}, defaultState) {
   }
 
   function reduce(state = defaultState, action) {
-    if (action[ID] && handlers[action[ID]]) {
+    if (action && handlers[action.type]) {
       if (opts.payload) {
-        return handlers[action[ID]](state, action.payload, action.meta);
+        return handlers[action.type](state, action.payload, action.meta);
       } else {
-        return handlers[action[ID]](state, action);
+        return handlers[action.type](state, action);
       }
     } else {
       return state;

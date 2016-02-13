@@ -23,6 +23,7 @@ npm install redux-act --save
   - [batch](#batchactions)
   - [disbatch](#disbatchstore--dispatch-actions)
 - [Cookbook](#cookbook)
+  - [Compatibility](#compatibility)
   - [Adding and removing actions](#adding-and-removing-actions)
   - [Async actions](#async-actions)
   - [Enable or disable batch](#enable-or-disable-batch)
@@ -67,7 +68,7 @@ counterStore.dispatch(add(5)); // counterStore.getState() === 6
 
 - **Do reducers work with combineReducers?** Of course, they are just normal reducers after all. Remember that according to the `combineReducers` checks, you will need to provide a default state when creating each reducer before combining them.
 
-- **How does it work?** There is not much magic. A generated id is assigned to each created action and will be used inside reducers instead of the string constants used inside Redux by default.
+- **How does it work?** There is not much magic. A generated id is prepended to each action type and will be used inside reducers instead of the string constants used inside Redux by default.
 
 - **Can you show how different it is from writing classic Redux?** Sure, you can check both commits to update [counter example](https://github.com/pauldijou/redux-act/commit/9e020137fb1b3e1e37d37c434032bec3c4e0873a) and [todomvc example](https://github.com/pauldijou/redux-act/commit/66a07913fdb36c9206e9bcbd5fa5577d1e6eceb7). You can also run both examples with `npm install && npm start` inside each folder.
 
@@ -124,7 +125,7 @@ append('b', 'c', 'd'); // stringStore.getState() === 'abcd'
 // than runtime generated id, just use a uppercase description (with eventually some underscores)
 // and it will be use as the id of the action
 const doSomething = createAction('STRING_CONSTANT');
-doSomething(1); // {__id__: 'STRING_CONSTANT', type: 'STRING_CONSTANT', payload: 1}
+doSomething(1); // { type: 'STRING_CONSTANT', payload: 1}
 
 // Little bonus, if you need to support metadata around your action,
 // like needed data but not really part of the payload, you add a second function
@@ -142,7 +143,7 @@ createReducer({
 
 **Parameters**
 
-- **description** (string, optional): used by logging and devtools when displaying the action. If this parameter is uppercase only, with underscores, it will used as the id and type of the action rather than the generated id. You can use this feature to have serializable actions you can share between client and server.
+- **description** (string, optional): used by logging and devtools when displaying the action. If this parameter is uppercase only, with underscores, it will be used as the action type without any generated id. You can use this feature to have serializable actions you can share between client and server.
 - **payloadReducer** (function, optional): transform multiple arguments as a unique payload.
 - **metaReducer** (function, optional): transform multiple arguments as a unique metadata object.
 
@@ -167,26 +168,29 @@ const serializableAction = createAction('SERIALIZABLE_ACTION');
 
 An action creator is basically a function that takes arguments and return an action which has the following format:
 
-- `__id__`: a generated id. Used by the reducers. Don't touch it.
-- `type`: totally useless for you, but provide support for devtools.
+- `type`: generated id + your description.
 - `payload`: the data passed when calling the action creator. Will be the first argument of the function except if you specified a payload reducer when creating the action.
 - `meta`: if you have provided a **metaReducer**, it will be used to create a metadata object assigned to this key. Otherwise, it's `undefined`.
 
 ```javascript
 const addTodo = createAction('Add todo');
 addTodo('content');
-// return { __id__: 1, type: '[1] Add todo', payload: 'content' }
+// return { type: '[1] Add todo', payload: 'content' }
 
 const editTodo = createAction('Edit todo', (id, content) => ({id, content}));
 editTodo(42, 'the answer');
-// return { __id__: 2, type: '[2] Edit todo', payload: {id: 42, content: 'the answer'} }
+// return { type: '[2] Edit todo', payload: {id: 42, content: 'the answer'} }
 
 const serializeTodo = createAction('SERIALIZE_TODO');
 serializeTodo(1);
-// return { __id__: 'SERIALIZE_TODO', type: 'SERIALIZE_TODO', payload: 1 }
+// return { type: 'SERIALIZE_TODO', payload: 1 }
 ```
 
 An action creator has the following methods:
+
+**getType()**
+
+Return the generated type that will be used by all actions from this action creator. Useful for [compatibility](#compatibility) purposes.
 
 **assignTo(store | dispatch)**
 
@@ -297,7 +301,7 @@ Like everything, a reducer is just a function. It takes the current state and an
 
 **options(object)**
 
-Since an action is an object with some private stuff (`__id__` and `type`), a `payload` (which is your actual data) and eventually some `metadata`, all reduce functions directly take the payload as their 2nd argument and the metadata as the 3rd by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
+Since an action is an object with a `type`, a `payload` (which is your actual data) and eventually some `metadata`, all reduce functions directly take the payload as their 2nd argument and the metadata as the 3rd by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
 
 ```javascript
 const add = createAction();
@@ -314,7 +318,7 @@ reducer.options({
 
 **has(action creator)**
 
-Test if the reducer has a reduce function for a particular action creator.
+Test if the reducer has a reduce function for a particular action creator or a string type.
 
 ```javascript
 const add = createAction();
@@ -325,11 +329,12 @@ const reducer = createReducer({
 
 reducer.has(add); // true
 reducer.has(sub); // false
+reducer.has(add.getType()); // true
 ```
 
 **on(action creator, reduce function) / off(action creator)**
 
-You can dynamically add and remove actions. See the [adding and removing actions](#adding-and-removing-actions) section for more infos.
+You can dynamically add and remove actions. See the [adding and removing actions](#adding-and-removing-actions) section for more infos. You can use either a `redux-act` action creator or a raw string type.
 
 ### assignAll(actionCreators, stores)
 
@@ -482,6 +487,55 @@ disbatch(store.dispatch, [inc(), dec(), inc()]);
 ```
 
 ## Cookbook
+
+### Compatibility
+
+`redux-act` is fully compatible with any other Redux library, it just uses `type` string after all.
+
+:warning: **Warning** It's important to remember that all `redux-act` actions will store data inside the `payload` property and that reducers will automatically extract it by default.
+
+```javascript
+// Mixing basic and redux-act actions inside a reducer
+import { createAction, createReducer } from 'redux-act';
+
+// Standard Redux action using a string constant
+const INCREMENT_TYPE = 'INCREMENT';
+const increment = () => ({ type: INCREMENT_TYPE });
+
+const decrement = createAction('decrement');
+
+const reducer = createReducer({
+  [INCREMENT_TYPE]: (state) => state + 1,
+  [decrement]: (state) => state - 1,
+}, 0);
+
+reducer.has(INCREMENT_TYPE); // true
+reducer.has(decrement); // true
+```
+
+```javascript
+// Using redux-act actions inside a basic reducer
+import { createAction } from 'redux-act';
+
+// Standard Redux action using a string constant
+const INCREMENT_TYPE = 'INCREMENT';
+const increment = () => ({ type: INCREMENT_TYPE });
+
+const decrement = createAction('decrement');
+
+function reducer(state = 0, action) {
+  switch (action.type) {
+  case INCREMENT_TYPE:
+    return state + 1;
+    break;
+  case decrement.getType():
+    return state - 1;
+    break;
+  default:
+    return state;
+  }
+};
+```
 
 ### Adding and removing actions
 

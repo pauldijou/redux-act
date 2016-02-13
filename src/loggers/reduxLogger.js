@@ -1,12 +1,9 @@
-import { ID } from '../constants';
 import batch from '../batch';
 
-const batchAction = batch([]);
-const batchId = batchAction[ID];
-const batchType = batchAction.type;
+const batchType = batch.getType();
 
 export function actionTransformer(action) {
-  if (action && action[ID] === batchId) {
+  if (action && action.type === batchType) {
     action.payload.type = batchType;
     return action.payload;
   }

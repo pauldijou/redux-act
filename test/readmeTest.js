@@ -1,7 +1,6 @@
 import chai from 'chai';
 import {createStore, combineReducers} from 'redux';
 import {assignAll, bindAll, createAction, createReducer, batch, disbatch} from '../src/index';
-import { ID } from '../src/constants';
 const expect = chai.expect;
 
 describe('README', function () {
@@ -76,7 +75,6 @@ describe('README', function () {
     addTodo('content');
     // return { __id__: 1, type: '[1] Add todo', payload: 'content' }
     const addTodoAction = addTodo('content');
-    expect(addTodoAction[ID]).to.be.a('number');
     expect(addTodoAction.type).to.be.a('string');
     expect(addTodoAction.payload).to.deep.equal('content');
 
@@ -84,7 +82,6 @@ describe('README', function () {
     editTodo(42, 'the answer');
     // return { __id__: 2, type: '[2] Edit todo', payload: {id: 42, content: 'the answer'} }
     const editTodoAction = editTodo(42, 'the answer');
-    expect(editTodoAction[ID]).to.be.a('number');
     expect(editTodoAction.type).to.be.a('string');
     expect(editTodoAction.payload).to.deep.equal({id: 42, content: 'the answer'});
 
@@ -92,7 +89,6 @@ describe('README', function () {
     serializeTodo(1);
     // return { __id__: 'SERIALIZE_TODO', type: 'SERIALIZE_TODO', payload: 1 }
     const serializeTodoAction = serializeTodo(1);
-    expect(serializeTodoAction[ID]).to.equal('SERIALIZE_TODO');
     expect(serializeTodoAction.type).to.equal('SERIALIZE_TODO');
     expect(serializeTodoAction.payload).to.equal(1);
 
@@ -261,9 +257,11 @@ describe('README', function () {
 
     reducer.has(add); // true
     reducer.has(sub); // false
+    reducer.has(add.getType()); // true
 
     expect(reducer.has(add)).to.be.true;
     expect(reducer.has(sub)).to.be.false;
+    expect(reducer.has(add.getType())).to.be.true;
   });
 
   it('should validate batch API', function () {
@@ -323,5 +321,64 @@ describe('README', function () {
     batch(dec(), dec());
     store.getState(); // -1
     expect(store.getState()).to.equal(-1);
+  });
+
+  it('should validate compatibility section 1', function () {
+    // Mixing basic and redux-act actions inside a reducer
+
+    // Standard Redux action using a string constant
+    const INCREMENT_TYPE = 'INCREMENT';
+    const increment = () => ({ type: INCREMENT_TYPE });
+
+    const decrement = createAction('decrement');
+
+    const reducer = createReducer({
+      [INCREMENT_TYPE]: (state) => state + 1,
+      [decrement]: (state) => state - 1,
+    }, 0);
+
+    expect(reducer.has(INCREMENT_TYPE)).to.be.true;
+    expect(reducer.has(decrement)).to.be.true;
+
+    const store = createStore(reducer);
+    expect(store.getState()).to.equal(0);
+    store.dispatch(increment());
+    expect(store.getState()).to.equal(1);
+    store.dispatch(increment());
+    expect(store.getState()).to.equal(2);
+    store.dispatch(decrement());
+    expect(store.getState()).to.equal(1);
+  });
+
+  it('should validate compatibility section 2', function () {
+    // Using redux-act actions inside a basic reducer
+
+    // Standard Redux action using a string constant
+    const INCREMENT_TYPE = 'INCREMENT';
+    const increment = () => ({ type: INCREMENT_TYPE });
+
+    const decrement = createAction('decrement');
+
+    function reducer(state = 0, action) {
+      switch (action.type) {
+      case INCREMENT_TYPE:
+        return state + 1;
+        break;
+      case decrement.getType():
+        return state - 1;
+        break;
+      default:
+        return state;
+      }
+    };
+
+    const store = createStore(reducer);
+    expect(store.getState()).to.equal(0);
+    store.dispatch(increment());
+    expect(store.getState()).to.equal(1);
+    store.dispatch(increment());
+    expect(store.getState()).to.equal(2);
+    store.dispatch(decrement());
+    expect(store.getState()).to.equal(1);
   });
 });
