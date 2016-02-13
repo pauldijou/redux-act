@@ -17,7 +17,7 @@ for (const level in console) {
     logger[level] = function levelFn(...args) {
       const lastArg = args.pop();
 
-      if (Array.isArray(lastArg)) {
+      if (Array.isArray(lastArg) && lastArg.type === batchType) {
         lastArg.forEach(action => {
           console[level].apply(console, [...args, action]);
         });
