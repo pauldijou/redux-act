@@ -706,7 +706,7 @@ Missing your favorite one? Please open an issue or a pull request, it will be ad
 
 ### [Redux Logger](https://github.com/fcomb/redux-logger)
 
-```
+```javascript
 import { applyMiddleware, createStore } from 'redux';
 import createLogger from 'redux-logger';
 import { loggers } from 'redux-act';
