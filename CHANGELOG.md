@@ -10,7 +10,7 @@ After a lot of thoughts, it wasn't worth it. It's blocking compatibility with ot
 
 ## Fix typo
 
-Because I'm not that good in English, I wrote `binded` instead of `bound` (thanks @appsforartists). The method has been renamed. The wrong one will be deprecated with a warning and remove in the 1.0.
+Because I'm not that good in English, I wrote `binded` instead of `bound` (thanks @appsforartists ). The method has been renamed. The wrong one will be deprecated with a warning and removed in the 1.0.
 
 ## Loggers
 
