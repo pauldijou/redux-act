@@ -1,8 +1,10 @@
 import chai from 'chai';
+import spies from 'chai-spies';
 import {createStore, applyMiddleware} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import {createAction, createReducer} from '../src/index';
 const expect = chai.expect;
+chai.use(spies);
 
 describe('createAction', function () {
   let firstAction, secondAction, reducer;
@@ -330,25 +332,36 @@ describe('createAction', function () {
   });
 
   it('should return current status', function () {
+    const spy = chai.spy.on(console, 'warn');
+    expect(spy).to.have.been.called.exactly(0);
+
     const store = createStore(() => 0);
     const action = createAction();
     expect(action.assigned()).to.be.false;
     expect(action.bound()).to.be.false;
+    expect(action.binded()).to.be.false;
+    expect(spy).to.have.been.called.exactly(1);
     expect(action.dispatched()).to.be.false;
 
     action.assignTo(store);
     expect(action.assigned()).to.be.true;
     expect(action.bound()).to.be.false;
+    expect(action.binded()).to.be.false;
+    expect(spy).to.have.been.called.exactly(2);
     expect(action.dispatched()).to.be.true;
 
     const boundAction = action.bindTo(store);
     expect(boundAction.assigned()).to.be.false;
     expect(boundAction.bound()).to.be.true;
+    expect(boundAction.binded()).to.be.true;
+    expect(spy).to.have.been.called.exactly(3);
     expect(boundAction.dispatched()).to.be.true;
 
     action.assignTo(undefined);
     expect(action.assigned()).to.be.false;
     expect(action.bound()).to.be.false;
+    expect(action.binded()).to.be.false;
+    expect(spy).to.have.been.called.exactly(4);
     expect(action.dispatched()).to.be.false;
   });
 
@@ -378,6 +391,5 @@ describe('createAction', function () {
     const boundAction = action.bindTo(store);
     testAction(boundAction.raw(1), 1);
     expect(store.getState()).to.equal(0);
-
   });
 });
