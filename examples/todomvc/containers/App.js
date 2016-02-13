@@ -1,31 +1,40 @@
-import React, { Component } from 'react';
-import TodoApp from './TodoApp';
-import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
-import { Provider } from 'react-redux';
-import { assignAll, batch } from 'redux-act';
-import configureStore from '../store/configureStore';
-import * as todoActions from '../actions/TodoActions';
+import React, { Component, PropTypes } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import Header from '../components/Header'
+import MainSection from '../components/MainSection'
+import * as TodoActions from '../reducers/todos'
 
-const store = configureStore();
-
-// Just to demonstrate it, we will auto-bind all actions
-// to the unique store but feel free to bind them inside
-// the components if you prefer so
-assignAll(todoActions, store);
-batch.assignTo(store);
-
-export default class App extends Component {
+class App extends Component {
   render() {
+    const { todos, actions } = this.props
     return (
       <div>
-        <Provider store={store}>
-          {() => <TodoApp /> }
-        </Provider>
-        <DebugPanel top right bottom>
-          <DevTools store={store}
-                    monitor={LogMonitor} />
-        </DebugPanel>
+        <Header addTodo={actions.addTodo} />
+        <MainSection todos={todos} actions={actions} />
       </div>
-    );
+    )
   }
 }
+
+App.propTypes = {
+  todos: PropTypes.array.isRequired,
+  actions: PropTypes.object.isRequired
+}
+
+function mapStateToProps(state) {
+  return {
+    todos: state.todos
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(TodoActions, dispatch)
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)

@@ -1,25 +1,52 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react'
 
-export default class Counter extends Component {
-  static propTypes = {
-    increment: PropTypes.func.isRequired,
-    incrementIfOdd: PropTypes.func.isRequired,
-    decrement: PropTypes.func.isRequired,
-    counter: PropTypes.number.isRequired
-  };
+class Counter extends Component {
+  constructor(props) {
+    super(props)
+    this.incrementAsync = this.incrementAsync.bind(this)
+    this.incrementIfOdd = this.incrementIfOdd.bind(this)
+  }
+
+  incrementIfOdd() {
+    if (this.props.value % 2 !== 0) {
+      this.props.onIncrement()
+    }
+  }
+
+  incrementAsync() {
+    setTimeout(this.props.onIncrement, 1000)
+  }
 
   render() {
-    const { increment, incrementIfOdd, decrement, counter } = this.props;
+    const { value, onIncrement, onDecrement } = this.props
     return (
       <p>
-        Clicked: {counter} times
+        Clicked: {value} times
         {' '}
-        <button onClick={increment}>+</button>
+        <button onClick={onIncrement}>
+          +
+        </button>
         {' '}
-        <button onClick={decrement}>-</button>
+        <button onClick={onDecrement}>
+          -
+        </button>
         {' '}
-        <button onClick={incrementIfOdd}>Increment if odd</button>
+        <button onClick={this.incrementIfOdd}>
+          Increment if odd
+        </button>
+        {' '}
+        <button onClick={this.incrementAsync}>
+          Increment async
+        </button>
       </p>
-    );
+    )
   }
 }
+
+Counter.propTypes = {
+  value: PropTypes.number.isRequired,
+  onIncrement: PropTypes.func.isRequired,
+  onDecrement: PropTypes.func.isRequired
+}
+
+export default Counter

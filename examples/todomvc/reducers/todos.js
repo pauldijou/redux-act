@@ -1,32 +1,52 @@
-import { createReducer } from 'redux-act';
-import * as actions from '../actions/TodoActions';
+import { createAction, createReducer } from 'redux-act';
 
-const initialState = [{
-  text: 'Use Redux',
-  marked: false,
-  id: 0
-}];
+const initialState = [
+  {
+    text: 'Use Redux',
+    completed: false,
+    id: 0
+  }
+]
+
+export const addTodo = createAction('add todo');
+export const deleteTodo = createAction('delete todo');
+export const editTodo = createAction('edit todo', (id, text) => ({ id, text }));
+export const completeTodo = createAction('complete todo');
+export const completeAll = createAction('complete all');
+export const clearCompleted = createAction('clear completed');
 
 export default createReducer({
-  [actions.addTodo]: (state, text)=> [{
-    id: (state.length === 0) ? 0 : state[0].id + 1,
-    marked: false,
-    text: text
-  }, ...state],
+  [addTodo]: (state, text) => [
+    {
+      id: state.reduce((maxId, todo) => Math.max(todo.id, maxId), -1) + 1,
+      completed: false,
+      text: text
+    },
+    ...state
+  ],
 
-  [actions.deleteTodo]: (state, id)=> state.filter(todo=> todo.id !== id),
+  [deleteTodo]: (state, id) => state.filter(todo =>
+    todo.id !== id
+  ),
 
-  [actions.editTodo]: (state, todo)=> state.map(t=> todo.id === t.id ? {...t, text: todo.text} : t),
+  [editTodo]: (state, { id, text }) => state.map(todo =>
+    todo.id === id ?
+      Object.assign({}, todo, { text }) :
+      todo
+  ),
 
-  [actions.markTodo]: (state, id)=> state.map(todo=> todo.id === id ? {...todo, marked: !todo.marked} : todo),
+  [completeTodo]: (state, id) => state.map(todo =>
+    todo.id === id ?
+      Object.assign({}, todo, { completed: !todo.completed }) :
+      todo
+  ),
 
-  [actions.markAll]: (state)=> {
-    const areAllMarked = state.every(todo => todo.marked);
-    return state.map(todo => ({
-      ...todo,
-      marked: !areAllMarked
-    }));
+  [completeAll]: (state) => {
+    const areAllMarked = state.every(todo => todo.completed)
+    return state.map(todo => Object.assign({}, todo, {
+      completed: !areAllMarked
+    }))
   },
 
-  [actions.clearMarked]: (state)=> state.filter(todo => todo.marked === false)
+  [clearCompleted]: (state) => state.filter(todo => todo.completed === false)
 }, initialState);
