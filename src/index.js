@@ -1,4 +1,5 @@
 export { default as createAction} from './createAction';
+export { default as createActionAsync} from './createActionAsync';
 export { default as createReducer} from './createReducer';
 export { default as assignAll} from './assignAll';
 export { default as bindAll} from './bindAll';

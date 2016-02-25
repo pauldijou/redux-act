@@ -9,6 +9,7 @@ const spy = chai.spy.on(console, 'log');
 
 describe('loggers > redux logger', function () {
   it('should log actions', function () {
+    spy.reset();
     const reducer = function () {};
     const logger = createLogger({ logger: console });
     const store = applyMiddleware(logger)(createStore)(reducer);
