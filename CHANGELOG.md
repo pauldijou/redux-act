@@ -1,3 +1,7 @@
+# 0.4.1
+
+Add [types API](https://github.com/pauldijou/redux-act#types) to help testing.
+
 # 0.4.0
 
 So, it wasn't the last release before 1.0 after all...
