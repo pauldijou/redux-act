@@ -22,6 +22,7 @@ npm install redux-act --save
   - [bindAll](#bindallactioncreators-stores)
   - [batch](#batchactions)
   - [disbatch](#disbatchstore--dispatch-actions)
+  - [types](#types)
 - [Cookbook](#cookbook)
   - [Compatibility](#compatibility)
   - [Adding and removing actions](#adding-and-removing-actions)
@@ -484,6 +485,35 @@ disbatch(store, [inc(), dec(), inc()]);
 // Disbatch immediately from dispatch
 disbatch(store.dispatch, inc(), dec(), inc());
 disbatch(store.dispatch, [inc(), dec(), inc()]);
+```
+
+### types
+
+**This is mostly internal stuff and is exposed only to help during testing.**
+
+As you know it, each action has a type. `redux-act` will ensure that each action creator type is unique. If you are not using serializable actions, you are good to go as all types will be dynamically generated and unique. But if you do use them, by default, nothing prevent you from creating two action creators with the same type. `redux-act` will throw if you call `createAction` with an already used type, and that is good, except when running tests.
+
+During testing, you might need to reset all types, start as fresh, to prevent `redux-act` to throw between tests. To do so, you have a small API to manage types stored by `redux-act`.
+
+```javascript
+import { types } from 'redux-act';
+
+// Add a type and prevent any action creator from using it from now on
+types.add('MY_TYPE');
+types.add('MY_TYPE_BIS');
+
+// Remove a type, you can use it again in an action creator
+types.remove('MY_TYPE_BIS');
+
+// Test if a type is already used
+types.has('MY_TYPE'); // true
+types.has('MY_TYPE_BIS'); // false
+
+// Return all used types
+types.all(); // [ 'MY_TYPE' ]
+
+// Remove all types
+types.clear();
 ```
 
 ## Cookbook
