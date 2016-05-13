@@ -41,7 +41,7 @@
   "scripts": {
     "clean": "rm -rf lib",
     "build": "babel src --out-dir lib",
-    "browserify": "browserify -s ReduxAct lib/index.js > dist/redux-act.js",
+    "browserify": "mkdir -p dist && browserify -s ReduxAct lib/index.js > dist/redux-act.js",
     "prepublish": "npm run clean && npm run build && npm run browserify",
     "test": "NODE_ENV=test mocha --recursive --compilers js:babel-core/register --reporter mocha-better-spec-reporter",
     "coverage": "babel-node ./node_modules/.bin/isparta cover ./node_modules/.bin/_mocha -- --recursive --reporter mocha-better-spec-reporter"
