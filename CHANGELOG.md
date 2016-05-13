@@ -1,3 +1,7 @@
+# 0.4.2
+
+Add browserify in order to compile a standalone file.
+
 # 0.4.1
 
 Add [types API](https://github.com/pauldijou/redux-act#types) to help testing.
