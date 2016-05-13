@@ -8,6 +8,8 @@ An opinionated lib to create actions and reducers for [Redux](https://github.com
 npm install redux-act --save
 ```
 
+You can also use a [browser friendly compiled file](https://npmcdn.com/redux-act@latest/dist/redux-act.js) from NPM CDN (mostly for online demo / snippets).
+
 ## Content
 
 - [Usage](#usage)
