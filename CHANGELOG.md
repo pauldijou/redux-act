@@ -1,3 +1,7 @@
+# 0.5.0
+
+Remove `meta` key from action if no meta-reducer provided.
+
 # 0.4.2
 
 Add browserify in order to compile a standalone file.

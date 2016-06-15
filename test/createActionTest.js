@@ -17,23 +17,25 @@ describe('createAction', function () {
 
   function testAction(action, payload, description, meta) {
     expect(action).to.be.an('object');
-    expect(action).to.contain.keys('type', 'payload', 'meta');
+    expect(action).to.contain.keys('type', 'payload');
     expect(action.type).to.be.a('string');
     if (typeof description === 'string') {
       expect(action.type).to.contain(description);
     }
     expect(action.payload).to.deep.equal(payload);
     if (typeof meta !== 'undefined') {
+      expect(action).to.contain.keys('meta');
       expect(action.meta).to.deep.equal(meta);
     }
   }
 
   function testSerializableAction(action, description, payload, meta) {
     expect(action).to.be.an('object');
-    expect(action).to.contain.keys('type', 'payload', 'meta');
+    expect(action).to.contain.keys('type', 'payload');
     expect(action.type).to.equal(description);
     expect(action.payload).to.deep.equal(payload);
     if (typeof meta !== 'undefined') {
+      expect(action).to.contain.keys('meta');
       expect(action.meta).to.deep.equal(meta);
     }
   }

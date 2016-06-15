@@ -4,8 +4,6 @@ let id = 0;
 
 const identity = (arg) => arg;
 
-const undef = () => undefined;
-
 const normalize = (dispatchOrStore) => {
   if (dispatchOrStore && typeof dispatchOrStore.dispatch === 'function') {
     return dispatchOrStore.dispatch;
@@ -34,7 +32,7 @@ export default function createAction(description, payloadReducer, metaReducer) {
   }
 
   if (typeof metaReducer !== 'function') {
-    metaReducer = undef;
+    metaReducer = undefined;
   }
 
   const isSerializable = (typeof description === 'string') && /^[A-Z_]+$/.test(description);
@@ -54,10 +52,17 @@ export default function createAction(description, payloadReducer, metaReducer) {
   let dispatchFunctions = undefined;
 
   function makeAction(...args) {
+    if (metaReducer) {
+      return {
+        type,
+        payload: payloadReducer(...args),
+        meta: metaReducer(...args)
+      };
+    }
+
     return {
-      type: type,
-      payload: payloadReducer(...args),
-      meta: metaReducer(...args)
+      type,
+      payload: payloadReducer(...args)
     };
   }
 
