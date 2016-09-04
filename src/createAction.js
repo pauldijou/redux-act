@@ -93,12 +93,6 @@ export default function createAction(description, payloadReducer, metaReducer) {
 
   actionCreator.assigned = () => !!dispatchFunctions;
   actionCreator.bound = () => false;
-  actionCreator.binded = () => {
-    if (console && console.warn) {
-      console.warn('"binded" method is deprecated. It has been renamed to "bound" to fix a typo');
-    }
-    return false;
-  };
   actionCreator.dispatched = actionCreator.assigned;
 
   actionCreator.bindTo = (dispatchOrStores) => {
@@ -110,12 +104,6 @@ export default function createAction(description, payloadReducer, metaReducer) {
     boundActionCreator.bindTo = () => boundActionCreator;
     boundActionCreator.assigned = () => false;
     boundActionCreator.bound = () => true;
-    boundActionCreator.binded = () => {
-      if (console && console.warn) {
-        console.warn('"binded" method is deprecated. It has been renamed to "bound" to fix a typo');
-      }
-      return true;
-    };
     boundActionCreator.dispatched = boundActionCreator.bound;
     return boundActionCreator;
   };

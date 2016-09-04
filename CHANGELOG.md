@@ -1,3 +1,7 @@
+# 1.0.0
+
+After months without any change, time to move to 1.0.0. Removing deprecated `binded` function in favor of the `bound` one.
+
 # 0.5.0
 
 Remove `meta` key from action if no meta-reducer provided.
