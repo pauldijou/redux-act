@@ -146,7 +146,7 @@ createReducer({
 
 **Parameters**
 
-- **description** (string, optional): used by logging and devtools when displaying the action. If this parameter is uppercase only, with underscores, it will be used as the action type without any generated id. You can use this feature to have serializable actions you can share between client and server.
+- **description** (string, optional): used by logging and devtools when displaying the action. If this parameter is uppercase only, with underscores and numbers, it will be used as the action type without any generated id. You can use this feature to have serializable actions you can share between client and server.
 - **payloadReducer** (function, optional): transform multiple arguments as a unique payload.
 - **metaReducer** (function, optional): transform multiple arguments as a unique metadata object.
 
@@ -164,7 +164,7 @@ const multipleAction = createAction((text, checked) => ({text, checked}))
 // Again, better to add a description
 const bestAction = createAction('Best. Action. Ever.', (text, checked) => ({text, checked}))
 // Serializable action (the description will be used as the unique identifier)
-const serializableAction = createAction('SERIALIZABLE_ACTION');
+const serializableAction = createAction('SERIALIZABLE_ACTION_42');
 ```
 
 ### action creator
