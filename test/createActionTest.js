@@ -71,7 +71,7 @@ describe('createAction', function () {
   });
 
   it('should support all format with serializable syntax', function () {
-    const description = createAction('DESCRIPTION_ACTION');
+    const description = createAction('DESCRIPTION_ACTION_W1TH_NUMB3R5');
     const args = createAction('ARGS_ACTION', (num, text)=> ({one: num, text}));
     const both = createAction('BOTH_ACTION', (id, content)=> ({id, content}));
     const meta = createAction('META_ACTION', (id, content)=> ({id, content}), (id, content) => ({more: true, prepend: 'hello ' + content}));
@@ -86,7 +86,7 @@ describe('createAction', function () {
     const bothAction = both(2, 'world');
     const metaAction = meta(2, 'world');
 
-    testSerializableAction(descriptionAction, 'DESCRIPTION_ACTION', true);
+    testSerializableAction(descriptionAction, 'DESCRIPTION_ACTION_W1TH_NUMB3R5', true);
     testSerializableAction(argsAction, 'ARGS_ACTION', {one: 4, text: 'hello'});
     testSerializableAction(bothAction, 'BOTH_ACTION', {id: 2, content: 'world'});
     testSerializableAction(metaAction, 'META_ACTION', {id: 2, content: 'world'}, {more: true, prepend: 'hello world'});

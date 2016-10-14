@@ -35,7 +35,7 @@ export default function createAction(description, payloadReducer, metaReducer) {
     metaReducer = undefined;
   }
 
-  const isSerializable = (typeof description === 'string') && /^[A-Z_]+$/.test(description);
+  const isSerializable = (typeof description === 'string') && /^[0-9A-Z_]+$/.test(description);
 
   if (isSerializable) {
     if (has(description)) {
