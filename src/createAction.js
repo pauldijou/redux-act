@@ -86,7 +86,7 @@ export default function createAction(description, payloadReducer, metaReducer) {
 
   actionCreator.raw = makeAction;
 
-  actionCreator.assignTo = (dispatchOrStores)=> {
+  actionCreator.assignTo = (dispatchOrStores) => {
     dispatchFunctions = normalizeAll(dispatchOrStores);
     return actionCreator;
   };

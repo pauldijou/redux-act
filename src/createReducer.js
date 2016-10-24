@@ -8,7 +8,7 @@ function normalizeType(typeOrActionCreator) {
 }
 
 export default function createReducer(handlers = {}, defaultState) {
-  let opts = {
+  const opts = {
     payload: true
   };
 
@@ -56,10 +56,7 @@ export default function createReducer(handlers = {}, defaultState) {
     }
   };
 
-  reduce.has = has;
-  reduce.on = on;
-  reduce.off = off;
-  reduce.options = options;
-
-  return reduce;
+  return Object.assign(reduce, {
+    has, on, off, options
+  });
 };

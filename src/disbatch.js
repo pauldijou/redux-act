@@ -17,7 +17,8 @@ export default function disbatch(store, ...actions) {
       throw new TypeError('disbatch must take a valid Redux store with a dispatch function as first parameter');
     }
 
-    store.disbatch = disbatch.bind(undefined, store);
-    return store;
+    return Object.assign(store, {
+      disbatch: disbatch.bind(undefined, store)
+    });
   }
 }
