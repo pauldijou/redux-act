@@ -11,6 +11,8 @@
     "batch"
   ],
   "main": "lib/index.js",
+  "types": "types.d.ts",
+  "typings": "types.d.ts",
   "homepage": "https://github.com/pauldijou/redux-act",
   "author": {
     "name": "Paul Dijou",
@@ -36,7 +38,9 @@
     "mocha-better-spec-reporter": "^3.0.1",
     "redux": "^3.5.2",
     "redux-logger": "^2.6.1",
-    "redux-thunk": "^2.0.1"
+    "redux-thunk": "^2.0.1",
+    "typescript": "^2.0.10",
+    "typescript-definition-tester": "0.0.5"
   },
   "scripts": {
     "clean": "rm -rf lib",
