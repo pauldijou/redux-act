@@ -40,13 +40,15 @@
     "redux-logger": "^2.6.1",
     "redux-thunk": "^2.0.1",
     "typescript": "^2.0.10",
-    "typescript-definition-tester": "0.0.5"
+    "typescript-definition-tester": "0.0.5",
+    "uglify-js": "^2.8.21"
   },
   "scripts": {
     "clean": "rm -rf lib",
     "build": "babel src --out-dir lib",
     "browserify": "mkdir -p dist && browserify -s ReduxAct lib/index.js > dist/redux-act.js",
-    "prepublish": "npm run clean && npm run build && npm run browserify",
+    "uglify": "uglifyjs dist/redux-act.js -o dist/redux-act.min.js",
+    "prepublish": "npm run clean && npm run build && npm run browserify && npm run uglify",
     "test": "NODE_ENV=test mocha --recursive --compilers js:babel-core/register --reporter mocha-better-spec-reporter",
     "coverage": "babel-node ./node_modules/.bin/isparta cover ./node_modules/.bin/_mocha -- --recursive --reporter mocha-better-spec-reporter"
   }
