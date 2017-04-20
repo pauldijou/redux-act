@@ -1,3 +1,7 @@
+# 1.2.0
+
+Add `transform-object-assign` babel plugin to support old browsers without `Object.assign`.
+
 # 1.1.0
 
 Support numbers in serializable actions.

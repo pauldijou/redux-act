@@ -5,7 +5,10 @@ An opinionated lib to create actions and reducers for [Redux](https://github.com
 ## Install
 
 ```bash
+# NPM
 npm install redux-act --save
+# Yarn
+yarn add redux-act
 ```
 
 You can also use a [browser friendly compiled file](https://unpkg.com/redux-act@latest/dist/redux-act.js) or the [minified version](https://unpkg.com/redux-act@latest/dist/redux-act.min.js) from NPM CDN (mostly for online demo / snippets).
