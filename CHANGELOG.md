@@ -1,3 +1,7 @@
+# 1.3.0
+
+Add `enableChecking` and `disableChecking` on `types` to support HMR.
+
 # 1.2.0
 
 Add `transform-object-assign` babel plugin to support old browsers without `Object.assign`.

@@ -322,6 +322,8 @@ reducer.options({
 });
 ```
 
+You can read [a more detailed explanation here](https://github.com/pauldijou/redux-act/issues/49).
+
 **has(action creator)**
 
 Test if the reducer has a reduce function for a particular action creator or a string type.
@@ -494,7 +496,7 @@ disbatch(store.dispatch, [inc(), dec(), inc()]);
 
 ### types
 
-**This is mostly internal stuff and is exposed only to help during testing.**
+**This is mostly internal stuff and is exposed only to help during development and testing.**
 
 As you know it, each action has a type. `redux-act` will ensure that each action creator type is unique. If you are not using serializable actions, you are good to go as all types will be dynamically generated and unique. But if you do use them, by default, nothing prevent you from creating two action creators with the same type. `redux-act` will throw if you call `createAction` with an already used type, and that is good, except when running tests.
 
@@ -514,11 +516,24 @@ types.remove('MY_TYPE_BIS');
 types.has('MY_TYPE'); // true
 types.has('MY_TYPE_BIS'); // false
 
+// Check if a type is already used,
+// will throw TypeError if so
+types.check('MY_TYPE') // throw TypeError
+types.check('MY_TYPE_BIS') // do nothing (return undefined)
+
 // Return all used types
 types.all(); // [ 'MY_TYPE' ]
 
 // Remove all types
 types.clear();
+
+// Disable all type checking meaning you can now have several actions
+// with the same type. This is needed for HMR (Hot Module Replacement)
+// but never never never enable it in production
+types.disableChecking();
+
+// Set back type checking
+types.enableChecking();
 ```
 
 ## Cookbook

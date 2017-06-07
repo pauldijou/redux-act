@@ -2,7 +2,7 @@ import chai from 'chai';
 import spies from 'chai-spies';
 import {createStore, applyMiddleware} from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import {createAction, createReducer} from '../src/index';
+import {createAction, createReducer, types} from '../src/index';
 const expect = chai.expect;
 chai.use(spies);
 
@@ -112,6 +112,13 @@ describe('createAction', function () {
     expect(() => {
       const action2 = createAction('THE_ACTION');
     }).to.throw('Duplicate action type: THE_ACTION');
+  });
+
+  it('should create duplicate serializable action creators if checking is disabled', function () {
+    types.disableChecking();
+    const action1 = createAction('THE_ACTION');
+    const action2 = createAction('THE_ACTION');
+    types.enableChecking();
   });
 
   it('should create a second action creator', function () {

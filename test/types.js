@@ -47,6 +47,16 @@ describe('types', function () {
     expect(types.has('three')).to.be.false;
   });
 
+  it('should check and throw if a type is already existing', function () {
+    expect(types.check('one')).to.be.undefined;
+    types.add('one');
+    expect(() => {
+      types.check('one');
+    }).to.throw('Duplicate action type: one');
+    types.remove('one');
+    expect(types.check('one')).to.be.undefined;
+  });
+
   it('should return all types', function () {
     types.clear();
     expect(types.all()).to.deep.equal([]);
@@ -75,5 +85,18 @@ describe('types', function () {
     expect(types.has('two')).to.be.false;
     expect(types.has('three')).to.be.false;
     expect(types.all()).to.deep.equal([]);
+  });
+
+  it('should allow to disable checking', function () {
+    expect(types.check('one')).to.be.undefined;
+    types.add('one');
+    types.disableChecking();
+    expect(types.check('one')).to.be.undefined;
+    types.enableChecking();
+    expect(() => {
+      types.check('one');
+    }).to.throw('Duplicate action type: one');
+    types.remove('one');
+    expect(types.check('one')).to.be.undefined;
   });
 });

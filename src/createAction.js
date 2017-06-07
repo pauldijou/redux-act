@@ -1,4 +1,4 @@
-import { add, has } from './types';
+import { add, check } from './types';
 
 let id = 0;
 
@@ -38,10 +38,7 @@ export default function createAction(description, payloadReducer, metaReducer) {
   const isSerializable = (typeof description === 'string') && /^[0-9A-Z_]+$/.test(description);
 
   if (isSerializable) {
-    if (has(description)) {
-      throw new TypeError(`Duplicate action type: ${description}`);
-    }
-
+    check(description);
     add(description);
   } else {
     ++id;
