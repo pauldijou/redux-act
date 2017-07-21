@@ -3,7 +3,7 @@ interface Identity<T> {
   (arg: T): T
 }
 
-interface Action<P, M> {
+interface Action<P, M={}> {
   type: string;
   payload: P;
   meta?: M;
@@ -32,7 +32,7 @@ interface StoreWithDisbatch<S> extends Store<S> {
 type StoreOrDispatch = Store<any> | Dispatch | Store<any>[] | Dispatch[]
 
 // Action creators
-interface ActionCreator<P, M> {
+interface ActionCreator<P, M={}> {
   (...args: any[]): Action<P, M>;
 
   getType(): string;
@@ -47,22 +47,22 @@ interface ActionCreator<P, M> {
   raw(...args: any[]): Action<P, M>;
 }
 
-export function createAction<P, M>(): ActionCreator<P, M>;
-export function createAction<P, M>(description: string, payloadReducer?: (...args: any[]) => P): ActionCreator<P, M>;
-export function createAction<P, M>(description: string, payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ActionCreator<P, M>;
-export function createAction<P, M>(payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ActionCreator<P, M>;
+export function createAction<P, M={}>(): ActionCreator<P, M>;
+export function createAction<P, M={}>(description: string, payloadReducer?: (...args: any[]) => P): ActionCreator<P, M>;
+export function createAction<P, M={}>(description: string, payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ActionCreator<P, M>;
+export function createAction<P, M={}>(payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ActionCreator<P, M>;
 
 
 // Reducers
-type Handler<S, P, M> = (state: S, payload: P, meta?: M) => S
-type ActionCreatorOrString<P, M> = ActionCreator<P, M> | string
+type Handler<S, P, M={}> = (state: S, payload: P, meta?: M) => S
+type ActionCreatorOrString<P, M={}> = ActionCreator<P, M> | string
 
 interface Reducer<S> {
   (state: S, action: Action<any, any>): S
 
   options(opts: Object): void
   has(actionCreator: ActionCreatorOrString<any, any>): boolean
-  on<P, M>(actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>): void
+  on<P, M={}>(actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>): void
   off(actionCreator: ActionCreatorOrString<any, any>): void
 }
 
@@ -70,7 +70,7 @@ interface Handlers<S> {
   [propertyName: string]: Handler<S, any, any>
 }
 
-type functionOn<S, P, M> = (actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>) => void
+type functionOn<S, P, M={}> = (actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>) => void
 type functionOff = (actionCreator: ActionCreatorOrString<any, any>) => void
 
 interface OnOff<S> {
