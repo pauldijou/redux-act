@@ -32,13 +32,12 @@ interface StoreWithDisbatch<S> extends Store<S> {
 type StoreOrDispatch = Store<any> | Dispatch | Store<any>[] | Dispatch[]
 
 // Action creators
-interface ActionCreator<P, M={}> {
+interface ComplexActionCreator<P, M={}> {
   (...args: any[]): Action<P, M>;
-
   getType(): string;
 
-  assignTo(arg: StoreOrDispatch): ActionCreator<P, M>;
-  bindTo(arg: StoreOrDispatch): ActionCreator<P, M>;
+  assignTo(arg: StoreOrDispatch): ComplexActionCreator<P, M>;
+  bindTo(arg: StoreOrDispatch): ComplexActionCreator<P, M>;
 
   assigned(): boolean;
   bound(): boolean;
@@ -47,10 +46,27 @@ interface ActionCreator<P, M={}> {
   raw(...args: any[]): Action<P, M>;
 }
 
-export function createAction<P, M={}>(): ActionCreator<P, M>;
-export function createAction<P, M={}>(description: string, payloadReducer?: (...args: any[]) => P): ActionCreator<P, M>;
-export function createAction<P, M={}>(description: string, payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ActionCreator<P, M>;
-export function createAction<P, M={}>(payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ActionCreator<P, M>;
+interface SimpleActionCreator<P, M={}> {
+  (payload: P): Action<P, M>;
+  getType(): string;
+
+  assignTo(arg: StoreOrDispatch): SimpleActionCreator<P, M>;
+  bindTo(arg: StoreOrDispatch): SimpleActionCreator<P, M>;
+
+  assigned(): boolean;
+  bound(): boolean;
+  dispatched(): boolean;
+
+  raw(payload: P): Action<P, M>;
+}
+
+type ActionCreator<P, M={}> = SimpleActionCreator<P, M> | ComplexActionCreator<P, M>;
+
+export function createAction<P, M={}>(): SimpleActionCreator<P, M>;
+export function createAction<P, M={}>(description: string): SimpleActionCreator<P, M>;
+export function createAction<P, M={}>(description: string, payloadReducer: (...args: any[]) => P): ComplexActionCreator<P, M>;
+export function createAction<P, M={}>(description: string, payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ComplexActionCreator<P, M>;
+export function createAction<P, M={}>(payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ComplexActionCreator<P, M>;
 
 
 // Reducers
@@ -88,9 +104,8 @@ interface ActionCreators {
 export function assignAll(actionCreators: ActionCreators | ActionCreator<any, any>[], stores: StoreOrDispatch): void;
 export function bindAll(actionCreators: ActionCreators | ActionCreator<any, any>[], stores: StoreOrDispatch): void;
 
-
 // Batching
-export const batch: ActionCreator<Action<any, any>[],null>
+export const batch: ComplexActionCreator<Action<any, any>[],null>
 
 export function disbatch(store: Store<any>): StoreWithDisbatch<any>;
 export function disbatch(store: Store<any>, ...actions: Action<any, any>[]): void;
