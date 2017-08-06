@@ -1,7 +1,7 @@
 import chai from 'chai';
-import spies from 'chai-spies';
+import spies from 'chai-spies-next';
 import {createStore, applyMiddleware} from 'redux';
-import createLogger from 'redux-logger';
+import {createLogger} from 'redux-logger';
 import {createAction, batch, loggers} from '../../src/index';
 chai.use(spies);
 const expect = chai.expect;

@@ -1,3 +1,8 @@
+# 1.3.1
+
+- Improve TS typings (thanks @psachs21)
+- Upgrade dependencies and fix tests
+
 # 1.3.0
 
 Add `enableChecking` and `disableChecking` on `types` to support HMR.

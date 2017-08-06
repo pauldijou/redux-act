@@ -4,7 +4,7 @@ import {
 
 const actionCreators = [
   createAction(),
-  createAction('aze'),
+  createAction<string>('aze'),
   createAction('aze', () => true),
   createAction('aze', () => true, () => 1),
   createAction(() => 1),

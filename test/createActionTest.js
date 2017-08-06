@@ -1,5 +1,5 @@
 import chai from 'chai';
-import spies from 'chai-spies';
+import spies from 'chai-spies-next';
 import {createStore, applyMiddleware} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import {createAction, createReducer, types} from '../src/index';

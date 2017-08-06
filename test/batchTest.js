@@ -1,5 +1,5 @@
 import chai from 'chai';
-import spies from 'chai-spies';
+import spies from 'chai-spies-next';
 import { createStore, combineReducers } from 'redux';
 import {batch, createAction, createReducer} from '../src/index.js';
 const expect = chai.expect;
