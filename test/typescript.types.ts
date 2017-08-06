@@ -13,6 +13,11 @@ const actionCreators = [
 
 const act1 = createAction((count: number) => count + 1)
 
+const simpleAct = createAction<boolean>('something');
+
+// Simple actions provide validation on params.
+const action = simpleAct(true);
+
 function onOff(on, off) {
   on(act1, () => 1)
 }
