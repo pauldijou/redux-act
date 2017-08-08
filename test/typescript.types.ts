@@ -18,6 +18,13 @@ const simpleAct = createAction<boolean>('something');
 // Simple actions provide validation on params.
 const action = simpleAct(true);
 
+const emptyAction = createAction('label');
+
+// Empty actions don't have payload.
+emptyAction();
+
+// Invalid: emptyAction(null);
+
 function onOff(on, off) {
   on(act1, () => 1)
 }
