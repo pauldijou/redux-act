@@ -33,7 +33,7 @@ You can also use a [browser friendly compiled file](https://unpkg.com/redux-act@
   - [Adding and removing actions](#adding-and-removing-actions)
   - [Async actions](#async-actions)
   - [Enable or disable batch](#enable-or-disable-batch)
-  - [Typescript](#typescript)
+  - [TypeScript](#typescript)
 - [Loggers](#loggers)
   - [Redux Logger](#redux-logger)
 
@@ -749,39 +749,36 @@ reducer.options({ payload: false });
 reducer.on(batch, (state, action) => action.payload.reduce(reducer, state));
 ```
 
-### Typescript
+### TypeScript
 
-We've built some basic typings around this API that will help Typescript identify potential issues in your code.
+We've built some basic typings around this API that will help TypeScript identify potential issues in your code.
 
-You can use any of the existing methods to create reducers and Typescript will work (as a superset of Javascript) but that kind of defeats some of the benefits
-of Typescript. For this reason, the following is the recommended way to create a reducer.
+You can use any of the existing methods to create reducers and TypeScript will work (as a superset of Javascript) but that kind of defeats some of the benefits of TypeScript. For this reason, the following is the recommended way to create a reducer.
 
 ```typescript
 import { createReducer, createAction } from 'redux-act';
 
 const defaultState = {
-	canCount: false,
-	canBounce: false,
-	count: 0
+	count: 0,
+  otherProperties: any,
+  ...
 };
 
-const setCanCount = createAction<boolean>('Set whether you can set count');
+const add = createAction<number>('Increase count');
 
 const reducer = createReducer<typeof defaultState>({}, defaultState);
 
-reducer.on(setCanCount, (state, payload) => ({
+reducer.on(add, (state, payload) => ({
 	...state,
-	canCount: payload
+	count: state.count + payload
 }));
 ```
 
-Using the `reducer.on()` API, Typescript will identify the payload set on `setCanCount` and provide that type as payload. This can be really handy once
-your code starts scaling up.
+Using the `reducer.on()` API, TypeScript will identify the payload set on `add` and provide that type as payload. This can be really handy once your code starts scaling up.
 
 #### Caveats
 
-Due to some limitations on the typescript typing system, our action creators have some limitations but you can create typed actions creators assuming you have no
-payload reducer.
+Due to some limitations on TypeScript typings, action creators have some limitations but you can create typed action creators assuming you have no payload reducer.
 
 ```typescript
 import { createAction } from 'redux-act';
@@ -791,7 +788,7 @@ const emptyAction = createAction('Another type');
 const otherAction = createAction<boolean>('Other action', (arg1, arg2) => ({ arg1, arg2 }));
 ```
 
-`action` and `emptyAction` will provide typing support, making sure `action` is provided a boolean as an arg, or `emptyAction` is not provided an argument at all.
+`action` and `emptyAction` will provide typing support, making sure `action` is provided a boolean as first and only argument, or `emptyAction` is not provided any argument at all.
 
 `otherAction`, on the otherhand, will be able to be called with any arguments, regardless of what the payload reducer expects.
 

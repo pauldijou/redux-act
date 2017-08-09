@@ -1,3 +1,7 @@
+# 1.3.2
+
+- Improve TS typings and doc (thanks @psachs21)
+
 # 1.3.1
 
 - Improve TS typings (thanks @psachs21)
