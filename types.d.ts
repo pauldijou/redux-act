@@ -31,37 +31,40 @@ interface StoreWithDisbatch<S> extends Store<S> {
 
 type StoreOrDispatch = Store<any> | Dispatch | Store<any>[] | Dispatch[]
 
-// Action creators
-interface ComplexActionCreator<P, M={}> {
-  (...args: any[]): Action<P, M>;
+interface BaseActionCreator<T> {
   getType(): string;
-
-  assignTo(arg: StoreOrDispatch): ComplexActionCreator<P, M>;
-  bindTo(arg: StoreOrDispatch): ComplexActionCreator<P, M>;
 
   assigned(): boolean;
   bound(): boolean;
   dispatched(): boolean;
+
+  assignTo(arg: StoreOrDispatch): T;
+  bindTo(arg: StoreOrDispatch): T;
+}
+
+// Action creators
+interface ComplexActionCreator<P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
+  (...args: any[]): Action<P, M>;
 
   raw(...args: any[]): Action<P, M>;
 }
 
-interface SimpleActionCreator<P, M={}> {
+interface SimpleActionCreator<P, M={}> extends BaseActionCreator<SimpleActionCreator<P, M>>  {
   (payload: P): Action<P, M>;
-  getType(): string;
-
-  assignTo(arg: StoreOrDispatch): SimpleActionCreator<P, M>;
-  bindTo(arg: StoreOrDispatch): SimpleActionCreator<P, M>;
-
-  assigned(): boolean;
-  bound(): boolean;
-  dispatched(): boolean;
 
   raw(payload: P): Action<P, M>;
 }
 
-type ActionCreator<P, M={}> = SimpleActionCreator<P, M> | ComplexActionCreator<P, M>;
+interface EmptyActionCreator extends BaseActionCreator<EmptyActionCreator> {
+  (): Action<null, null>;
 
+  raw(): Action<null, null>;
+}
+
+type ActionCreator<P, M={}> = SimpleActionCreator<P, M> | ComplexActionCreator<P, M> | EmptyActionCreator;
+
+export function createAction(): EmptyActionCreator;
+export function createAction(description: string): EmptyActionCreator;
 export function createAction<P, M={}>(): SimpleActionCreator<P, M>;
 export function createAction<P, M={}>(description: string): SimpleActionCreator<P, M>;
 export function createAction<P, M={}>(description: string, payloadReducer: (...args: any[]) => P): ComplexActionCreator<P, M>;
