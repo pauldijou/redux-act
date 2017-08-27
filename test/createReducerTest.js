@@ -133,6 +133,58 @@ describe('createReducer', function () {
     expect(store.getState()).to.equal(3);
   });
 
+  it('should chain on and off methods', function () {
+    const inc = createAction()
+    const dec = createAction()
+    const add = createAction()
+    const reducer = createReducer({}, 0)
+      .on(inc, state => state + 1)
+      .on(dec, state => state - 1)
+      .on(add, (state, payload) => state + payload)
+      .off(add)
+
+    const store = createStore(reducer);
+    inc.assignTo(store)
+    dec.assignTo(store)
+    add.assignTo(store)
+
+    inc();
+    expect(store.getState()).to.equal(1);
+    inc();
+    expect(store.getState()).to.equal(2);
+    dec();
+    expect(store.getState()).to.equal(1);
+    add(3);
+    expect(store.getState()).to.equal(1);
+  });
+
+  it('should support arrays inside on and off methods', function () {
+    const reducer = createReducer({}, 0);
+    const store = createStore(reducer);
+    const inc = createAction().assignTo(store)
+    const inc2 = createAction().assignTo(store)
+    const inc3 = createAction().assignTo(store)
+    const inc4 = createAction().assignTo(store)
+
+    reducer.on([inc, inc2, inc3, inc4], state=> state + 1)
+
+    inc();
+    inc3();
+    expect(store.getState()).to.equal(2);
+    inc2();
+    inc4();
+    expect(store.getState()).to.equal(4);
+
+    reducer.off([inc2, inc3]);
+
+    inc();
+    inc3();
+    expect(store.getState()).to.equal(5);
+    inc2();
+    inc4();
+    expect(store.getState()).to.equal(6);
+  });
+
   it('should update its options', function () {
     const add = createAction();
     const reducer = createReducer({
@@ -147,16 +199,18 @@ describe('createReducer', function () {
     add(2);
     expect(store.getState()).to.equal(5);
 
-    reducer.on(add, (state, payload)=> state + payload);
-    reducer.options({payload: true});
+    reducer
+      .options({payload: true})
+      .on(add, (state, payload)=> state + payload);
 
     add(-4);
     expect(store.getState()).to.equal(1);
     add(10);
     expect(store.getState()).to.equal(11);
 
-    reducer.on(add, (state, action)=> state + action.payload);
-    reducer.options({payload: false});
+    reducer
+      .on(add, (state, action)=> state + action.payload)
+      .options({payload: false});
 
     add(30);
     expect(store.getState()).to.equal(41);

@@ -1,3 +1,9 @@
+# 1.4.0
+
+- `on` and `off` reducer functions now support arrays of action creators.
+- `on` and `off` reducer functions now return the reducer itself so you can chain them.
+- `options` now also return the reducer.
+
 # 1.3.2
 
 - Improve TS typings and doc (thanks @psachs21)

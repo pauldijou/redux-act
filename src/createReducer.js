@@ -12,20 +12,38 @@ export default function createReducer(handlers = {}, defaultState) {
     payload: true
   };
 
+  const reducer = Object.assign(reduce, {
+    has, on, off, options
+  })
+
   function has(typeOrActionCreator) {
     return !!handlers[normalizeType(typeOrActionCreator)];
   }
 
   function on(typeOrActionCreator, handler) {
-    handlers[normalizeType(typeOrActionCreator)] = handler;
+    if (Array.isArray(typeOrActionCreator)) {
+      typeOrActionCreator.forEach(function (action) {
+        on(action, handler)
+      })
+    } else {
+      handlers[normalizeType(typeOrActionCreator)] = handler;
+    }
+
+    return reducer;
   }
 
   function off(typeOrActionCreator) {
-    delete handlers[normalizeType(typeOrActionCreator)];
+    if (Array.isArray(typeOrActionCreator)) {
+      typeOrActionCreator.forEach(off)
+    } else {
+      delete handlers[normalizeType(typeOrActionCreator)];
+    }
+    return reducer;
   }
 
   function options(newOpts) {
     Object.keys(newOpts).forEach(name => opts[name] = newOpts[name])
+    return reducer;
   }
 
   if (typeof handlers === 'function') {
@@ -56,7 +74,5 @@ export default function createReducer(handlers = {}, defaultState) {
     }
   };
 
-  return Object.assign(reduce, {
-    has, on, off, options
-  });
+  return reducer;
 };

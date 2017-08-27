@@ -79,21 +79,21 @@ type ActionCreatorOrString<P, M={}> = ActionCreator<P, M> | string
 interface Reducer<S> {
   (state: S, action: Action<any, any>): S
 
-  options(opts: Object): void
+  options(opts: Object): Reducer<S>
   has(actionCreator: ActionCreatorOrString<any, any>): boolean
-  on<P, M={}>(actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>): void
-  off(actionCreator: ActionCreatorOrString<any, any>): void
+  on<P, M={}>(actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>): Reducer<S>
+  off(actionCreator: ActionCreatorOrString<any, any>): Reducer<S>
 }
 
 interface Handlers<S> {
   [propertyName: string]: Handler<S, any, any>
 }
 
-type functionOn<S, P, M={}> = (actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>) => void
-type functionOff = (actionCreator: ActionCreatorOrString<any, any>) => void
+type functionOn<S, P, M={}> = (actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>) => Reducer<S>
+type functionOff<S> = (actionCreator: ActionCreatorOrString<any, any>) => Reducer<S>
 
 interface OnOff<S> {
-  (on: functionOn<S, any, any>, off: functionOff): void;
+  (on: functionOn<S, any, any>, off: functionOff<S>): void;
 }
 
 export function createReducer<S>(handlers: Handlers<S> | OnOff<S>, defaultState?: S): Reducer<S>;

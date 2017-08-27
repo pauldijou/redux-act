@@ -308,7 +308,7 @@ Like everything, a reducer is just a function. It takes the current state and an
 
 **options(object)**
 
-Since an action is an object with a `type`, a `payload` (which is your actual data) and eventually some `metadata`, all reduce functions directly take the payload as their 2nd argument and the metadata as the 3rd by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer.
+Since an action is an object with a `type`, a `payload` (which is your actual data) and eventually some `metadata`, all reduce functions directly take the payload as their 2nd argument and the metadata as the 3rd by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer. Returns the reducer itself for chaining.
 
 ```javascript
 const add = createAction();
@@ -341,9 +341,12 @@ reducer.has(sub); // false
 reducer.has(add.getType()); // true
 ```
 
-**on(action creator, reduce function) / off(action creator)**
+**on(action creator | action creator[], reduce function)**
+**off(action creator | action creator[])**
 
-You can dynamically add and remove actions. See the [adding and removing actions](#adding-and-removing-actions) section for more infos. You can use either a `redux-act` action creator or a raw string type.
+You can dynamically add and remove actions. See the [adding and removing actions](#adding-and-removing-actions) section for more infos. You can use either a `redux-act` action creator or a raw string type. You can also use array of those, it will apply the `on` or `off` function to all elements.
+
+They both return the reducer itself so you can chain them.
 
 ### assignAll(actionCreators, stores)
 
