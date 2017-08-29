@@ -49,6 +49,24 @@ interface ComplexActionCreator<P, M={}> extends BaseActionCreator<ComplexActionC
   raw(...args: any[]): Action<P, M>;
 }
 
+interface ComplexActionCreator1<Arg1, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
+  (arg1: Arg1): Action<P, M>;
+
+  raw(arg1: Arg1): Action<P, M>;
+}
+
+interface ComplexActionCreator2<Arg1, Arg2, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
+  (arg1: Arg1, arg2: Arg2): Action<P, M>;
+
+  raw(arg1: Arg1, arg2: Arg2): Action<P, M>;
+}
+
+interface ComplexActionCreator3<Arg1, Arg2, Arg3, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
+  (arg1: Arg1, arg2: Arg2, arg3: Arg3): Action<P, M>;
+
+  raw(arg1: Arg1, arg2: Arg2, arg3: Arg3): Action<P, M>;
+}
+
 interface SimpleActionCreator<P, M={}> extends BaseActionCreator<SimpleActionCreator<P, M>>  {
   (payload: P): Action<P, M>;
 
@@ -62,19 +80,35 @@ interface EmptyActionCreator extends BaseActionCreator<EmptyActionCreator> {
 }
 
 type ActionCreator<P, M={}> = SimpleActionCreator<P, M> | ComplexActionCreator<P, M> | EmptyActionCreator;
+type ActionCreator1<Arg1, P, M={}> = ComplexActionCreator1<Arg1, P, M>;
+type ActionCreator2<Arg1, Arg2, P, M={}> = ComplexActionCreator2<Arg1, Arg2, P, M>;
+type ActionCreator3<Arg1, Arg2, Arg3, P, M={}> = ComplexActionCreator3<Arg1, Arg2, Arg3, P, M>;
+
+type PayloadReducer<P> = (...args: any[]) => P
+type PayloadReducer1<Arg1, P> = (arg1: Arg1) => P
+type PayloadReducer2<Arg1, Arg2, P> = (arg1: Arg1, arg2: Arg2) => P
+type PayloadReducer3<Arg1, Arg2, Arg3, P> = (arg1: Arg1, arg2: Arg2, arg3: Arg3) => P
+
+type MetaReducer<M> = (...args: any[]) => M
 
 export function createAction(): EmptyActionCreator;
 export function createAction(description: string): EmptyActionCreator;
 export function createAction<P, M={}>(): SimpleActionCreator<P, M>;
 export function createAction<P, M={}>(description: string): SimpleActionCreator<P, M>;
-export function createAction<P, M={}>(description: string, payloadReducer: (...args: any[]) => P): ComplexActionCreator<P, M>;
-export function createAction<P, M={}>(description: string, payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ComplexActionCreator<P, M>;
-export function createAction<P, M={}>(payloadReducer: (...args: any[]) => P, metaReducer?: (...args: any[]) => M): ComplexActionCreator<P, M>;
+export function createAction<Arg1, P, M={}>(description: string, payloadReducer: PayloadReducer1<Arg1, P>): ComplexActionCreator1<Arg1, P, M>;
+export function createAction<Arg1, Arg2, P, M={}>(description: string, payloadReducer: PayloadReducer2<Arg1, Arg2, P>): ComplexActionCreator2<Arg1, Arg2, P, M>;
+export function createAction<Arg1, Arg2, Arg3, P, M={}>(description: string, payloadReducer: PayloadReducer3<Arg1, Arg2, Arg3, P>): ComplexActionCreator3<Arg1, Arg2, Arg3, P, M>;
+export function createAction<P, M={}>(description: string, payloadReducer:PayloadReducer<P>): ComplexActionCreator<P, M>;
+export function createAction<P, M={}>(description: string, payloadReducer: PayloadReducer<P>, metaReducer?: MetaReducer<M>): ComplexActionCreator<P, M>;
+export function createAction<P, M={}>(payloadReducer: PayloadReducer<P>, metaReducer?: MetaReducer<M>): ComplexActionCreator<P, M>;
 
 
 // Reducers
 type Handler<S, P, M={}> = (state: S, payload: P, meta?: M) => S
 type ActionCreatorOrString<P, M={}> = ActionCreator<P, M> | string
+type ActionCreatorOrString1<Arg1, P, M={}> = ActionCreator1<Arg1, P, M> | string
+type ActionCreatorOrString2<Arg1, Arg2, P, M={}> = ActionCreator2<Arg1, Arg2, P, M> | string
+type ActionCreatorOrString3<Arg1, Arg2, Arg3, P, M={}> = ActionCreator3<Arg1, Arg2, Arg3, P, M> | string
 
 interface Reducer<S> {
   (state: S, action: Action<any, any>): S
@@ -82,6 +116,9 @@ interface Reducer<S> {
   options(opts: Object): Reducer<S>
   has(actionCreator: ActionCreatorOrString<any, any>): boolean
   on<P, M={}>(actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>): Reducer<S>
+  on<Arg1, Arg2, Arg3, P, M={}>(actionCreator: ActionCreatorOrString3<Arg1, Arg2, Arg3, P, M>, handler: Handler<S, P, M>): Reducer<S>
+  on<Arg1, Arg2, P, M={}>(actionCreator: ActionCreatorOrString2<Arg1, Arg2, P, M>, handler: Handler<S, P, M>): Reducer<S>
+  on<Arg1, P, M={}>(actionCreator: ActionCreatorOrString1<Arg1, P, M>, handler: Handler<S, P, M>): Reducer<S>  
   off(actionCreator: ActionCreatorOrString<any, any>): Reducer<S>
 }
 
