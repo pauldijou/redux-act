@@ -27,6 +27,10 @@ describe('createAction', function () {
       expect(action).to.contain.keys('meta');
       expect(action.meta).to.deep.equal(meta);
     }
+    if (payload instanceof Error) {
+      expect(action).to.contain.keys('error');
+      expect(action.error).to.equal(true);
+    }
   }
 
   function testSerializableAction(action, description, payload, meta) {
@@ -390,4 +394,16 @@ describe('createAction', function () {
     testAction(boundAction.raw(1), 1);
     expect(store.getState()).to.equal(0);
   });
+
+  it('should add error key', function () {
+    const action = createAction();
+    const actionWithMeta = createAction(x => x, x => ({more: true, content: x}));
+    const error = new Error('Simple error');
+
+    const errorAction = action(error);
+    const errorActionMeta = actionWithMeta(error);
+
+    testAction(errorAction, error);
+    testAction(errorActionMeta, error);
+  })
 });

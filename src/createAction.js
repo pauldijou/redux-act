@@ -49,17 +49,21 @@ export default function createAction(description, payloadReducer, metaReducer) {
   let dispatchFunctions = undefined;
 
   function makeAction(...args) {
+    const error = args[0] instanceof Error ? { error: true } : {};
+
     if (metaReducer) {
       return {
         type,
         payload: payloadReducer(...args),
-        meta: metaReducer(...args)
+        meta: metaReducer(...args),
+        ...error
       };
     }
 
     return {
       type,
-      payload: payloadReducer(...args)
+      payload: payloadReducer(...args),
+      ...error,
     };
   }
 
