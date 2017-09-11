@@ -1,3 +1,7 @@
+# 1.4.1
+
+- Improve TS types for action creators with payload function up to 6 arguments (thanks @ej9x)
+
 # 1.4.0
 
 - `on` and `off` reducer functions now support arrays of action creators.
