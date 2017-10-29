@@ -1,3 +1,7 @@
+# 1.5.0
+
+- Add `error` property to support FSA. (thanks @gotrecillo)
+
 # 1.4.1
 
 - Improve TS types for action creators with payload function up to 6 arguments (thanks @ej9x)

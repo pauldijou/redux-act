@@ -49,37 +49,45 @@ export default function createAction(description, payloadReducer, metaReducer) {
   let dispatchFunctions = undefined;
 
   function makeAction(...args) {
-    const error = args[0] instanceof Error ? { error: true } : {};
+    const payload = payloadReducer(...args)
 
     if (metaReducer) {
       return {
         type,
-        payload: payloadReducer(...args),
+        payload: payload,
+        error: payload instanceof Error,
         meta: metaReducer(...args),
-        ...error
       };
     }
 
     return {
       type,
-      payload: payloadReducer(...args),
-      ...error,
+      payload: payload,
+      error: payload instanceof Error,
     };
   }
 
-  const makeAndDispatch = (dispatchs) => (...args) => {
+  const makeAndDispatch = (dispatchs, isError) => (...args) => {
+    const payloadedAction = makeAction(...args);
+    if (!payloadedAction.error) {
+      payloadedAction.error = isError
+    }
+
     if (Array.isArray(dispatchs)) {
-      const payloadedAction = makeAction(...args);
       return dispatchs.map(dispatch => dispatch(payloadedAction));
     } else if (dispatchs) {
-      return dispatchs(makeAction(...args));
+      return dispatchs(payloadedAction);
     } else {
-      return makeAction(...args);
+      return payloadedAction;
     }
   }
 
   function actionCreator(...args) {
-    return makeAndDispatch(dispatchFunctions)(...args);
+    return makeAndDispatch(dispatchFunctions, false)(...args);
+  }
+
+  actionCreator.asError = (...args) => {
+    return makeAndDispatch(dispatchFunctions, true)(...args);
   }
 
   actionCreator.getType = () => type;
@@ -97,7 +105,8 @@ export default function createAction(description, payloadReducer, metaReducer) {
   actionCreator.dispatched = actionCreator.assigned;
 
   actionCreator.bindTo = (dispatchOrStores) => {
-    const boundActionCreator = makeAndDispatch(normalizeAll(dispatchOrStores));
+    const boundActionCreator = makeAndDispatch(normalizeAll(dispatchOrStores, false));
+    boundActionCreator.asError = makeAndDispatch(normalizeAll(dispatchOrStores, true));
     boundActionCreator.raw = makeAction;
     boundActionCreator.getType = actionCreator.getType;
     boundActionCreator.toString = actionCreator.toString;

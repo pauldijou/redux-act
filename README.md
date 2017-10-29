@@ -178,6 +178,7 @@ An action creator is basically a function that takes arguments and return an act
 - `type`: generated id + your description.
 - `payload`: the data passed when calling the action creator. Will be the first argument of the function except if you specified a payload reducer when creating the action.
 - `meta`: if you have provided a **metaReducer**, it will be used to create a metadata object assigned to this key. Otherwise, it's `undefined`.
+- `error`: a boolean indicating if the action is an error according to [FSA](https://github.com/acdlite/flux-standard-action#error).
 
 ```javascript
 const addTodo = createAction('Add todo');
@@ -268,6 +269,26 @@ When an action creator is either assigned or bound, it will no longer only retur
 const action = createAction().bindTo(store);
 action(1); // store has been updated
 action.raw(1); // return the action, store hasn't been updated
+```
+
+**asError(...args)***
+
+By default, if your payload is an instance of `Error`, the action will be tagged as an error. But if you need to use any other kind of payload as an error payload, you can always use this method. It will apply the same payload reducer by setting the `error` to `true`.
+
+```javascript
+const actionCreator = createAction(value => {
+  if (value > 10) { return new Error('Must be less than 10') }
+  return { value: value }
+})
+
+const goodAction = actionCreator(5)
+goodAction.error // false
+
+const badAction = actionCreator(20)
+badAction.error // true
+
+const forcedBadAction = actionCreator.asError(1)
+forcedBadAction.error // true
 ```
 
 ### createReducer(handlers, [defaultState])
@@ -496,6 +517,24 @@ disbatch(store, [inc(), dec(), inc()]);
 // Disbatch immediately from dispatch
 disbatch(store.dispatch, inc(), dec(), inc());
 disbatch(store.dispatch, [inc(), dec(), inc()]);
+```
+
+### asError(action)
+
+**Parameters**
+
+- **action** (object): a standard Redux action (with a `type` property)
+
+Set the `error` property to `true`.
+
+```javascript
+import { createAction, asError } from 'redux-act';
+
+const goodAction = createAction();
+goodAction.error; // false
+
+const badAction = asError(goodAction);
+badAction.error; // true
 ```
 
 ### types

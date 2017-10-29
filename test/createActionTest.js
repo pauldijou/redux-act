@@ -15,7 +15,7 @@ describe('createAction', function () {
     expect(actionCreator.assignTo).to.be.a('function');
   }
 
-  function testAction(action, payload, description, meta) {
+  function testAction(action, payload, description, meta, isError) {
     expect(action).to.be.an('object');
     expect(action).to.contain.keys('type', 'payload');
     expect(action.type).to.be.a('string');
@@ -27,10 +27,8 @@ describe('createAction', function () {
       expect(action).to.contain.keys('meta');
       expect(action.meta).to.deep.equal(meta);
     }
-    if (payload instanceof Error) {
-      expect(action).to.contain.keys('error');
-      expect(action.error).to.equal(true);
-    }
+    expect(action).to.contain.keys('error');
+    expect(action.error).to.equal(isError === true ? true : false);
   }
 
   function testSerializableAction(action, description, payload, meta) {
@@ -396,14 +394,24 @@ describe('createAction', function () {
   });
 
   it('should add error key', function () {
-    const action = createAction();
-    const actionWithMeta = createAction(x => x, x => ({more: true, content: x}));
     const error = new Error('Simple error');
+    const action = createAction();
+    const actionWithPayload = createAction(value => {
+      if (value === 'error') { return error }
+      return value
+    });
+    const actionWithMeta = createAction(x => x, x => ({more: true, content: x}));
 
     const errorAction = action(error);
+    const errorActionPayload = actionWithPayload('error');
     const errorActionMeta = actionWithMeta(error);
+    const errorAs1 = action.asError(error);
+    const errorAs2 = action.asError('error');
 
-    testAction(errorAction, error);
-    testAction(errorActionMeta, error);
+    testAction(errorAction, error, undefined, undefined, true);
+    testAction(errorActionPayload, error, undefined, undefined, true);
+    testAction(errorActionMeta, error, undefined, {more: true, content: error}, true);
+    testAction(errorAs1, error, undefined, undefined, true);
+    testAction(errorAs2, 'error', undefined, undefined, true);
   })
 });

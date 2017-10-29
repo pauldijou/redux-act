@@ -7,4 +7,5 @@ export { default as bindAll} from './bindAll';
 export { default as batch} from './batch';
 export { default as disbatch} from './disbatch';
 export { default as loggers } from './loggers';
+export { default as asError } from './asError';
 export const types = _types;
