@@ -1,3 +1,7 @@
+# 1.5.1
+
+- Add missing TS types. (thanks @comerc)
+
 # 1.5.0
 
 - Add `error` property to support FSA. (thanks @gotrecillo)
