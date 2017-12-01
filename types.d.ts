@@ -194,4 +194,6 @@ export namespace types {
   export function has(t: string): boolean;
   export function all(): string[];
   export function clear(): void;
+  export function disableChecking(): void;
+  export function enableChecking(): void;
 }
