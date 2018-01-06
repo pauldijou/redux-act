@@ -21,6 +21,9 @@ export default function createReducer(handlers = {}, defaultState) {
   }
 
   function on(typeOrActionCreator, handler) {
+    if (!handler) {
+      handler = (state, payload) => payload;
+    }
     if (Array.isArray(typeOrActionCreator)) {
       typeOrActionCreator.forEach(function (action) {
         on(action, handler)
@@ -72,7 +75,7 @@ export default function createReducer(handlers = {}, defaultState) {
     } else {
       return state;
     }
-  };
+  }
 
   return reducer;
 };

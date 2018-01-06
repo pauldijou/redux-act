@@ -147,6 +147,7 @@ interface Reducer<S> {
 
   options(opts: Object): Reducer<S>
   has(actionCreator: ActionCreatorOrString<any, any>): boolean
+  on<M={}>(actionCreator: ActionCreatorOrString<S, M>): Reducer<S>
   on<P, M={}>(actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>): Reducer<S>
   on<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M={}>(actionCreator: ActionCreatorOrString6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M>, handler: Handler<S, P, M>): Reducer<S>
   on<Arg1, Arg2, Arg3, Arg4, Arg5, P, M={}>(actionCreator: ActionCreatorOrString5<Arg1, Arg2, Arg3, Arg4, Arg5, P, M>, handler: Handler<S, P, M>): Reducer<S>
