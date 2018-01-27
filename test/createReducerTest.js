@@ -369,4 +369,18 @@ describe('createReducer', function () {
     store.dispatch(a1());
     expect(store.getState()).to.deep.equal({ one: 3, two: 3, three: 1 });
   });
+
+  it('should support fallback options', function () {
+    const action = createAction();
+    const reducer = createReducer({}, 0);
+    reducer.options({
+      fallback: (state, payload) => state + payload,
+    });
+    const store = createStore(reducer);
+    expect(store.getState()).to.equal(0);
+    store.dispatch(action(5));
+    expect(store.getState()).to.equal(5);
+    store.dispatch(action(-10));
+    expect(store.getState()).to.equal(-5);
+  });
 });

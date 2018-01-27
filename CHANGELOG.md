@@ -1,3 +1,8 @@
+# 1.6.0
+
+- Add `fallback` option to handle any non-supported action inside a reducer.
+- Ignore any action which type starts with "@@redux/". This can be a **breaking change** but should not be since you should never handle those actions.
+
 # 1.5.1
 
 - Add missing TS types. (thanks @comerc)

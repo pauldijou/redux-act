@@ -327,7 +327,7 @@ const reducerFactory = createReducer(function (on, off) {
 
 Like everything, a reducer is just a function. It takes the current state and an action payload and return the new state. It has the following methods.
 
-**options(object)**
+**options({ payload: boolean, fallback: [handler] })**
 
 Since an action is an object with a `type`, a `payload` (which is your actual data) and eventually some `metadata`, all reduce functions directly take the payload as their 2nd argument and the metadata as the 3rd by default rather than the whole action since all other properties are handled by the lib and you shouldn't care about them anyway. If you really need to use the full action, you can change the behavior of a reducer. Returns the reducer itself for chaining.
 
@@ -345,6 +345,23 @@ reducer.options({
 ```
 
 You can read [a more detailed explanation here](https://github.com/pauldijou/redux-act/issues/49).
+
+If you specify a `fallback` handler, which has the exact same signature as any action handler inside the reducer, it will be called anytime you dispatch an action which is not handled by the reducer.
+
+```javascript
+const action = createAction();
+const reducer = createReducer({}, 0);
+reducer.options({
+  // action is not handled, so fallback will be called
+  fallback: (state, payload) => state + payload,
+});
+const store = createStore(reducer);
+store.getState(); // 0
+store.dispatch(action(5));
+store.getState(); // 5
+store.dispatch(action(-10));
+store.getState(); // -5
+```
 
 **has(action creator)**
 

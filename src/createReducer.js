@@ -9,7 +9,8 @@ function normalizeType(typeOrActionCreator) {
 
 export default function createReducer(handlers = {}, defaultState) {
   const opts = {
-    payload: true
+    payload: true,
+    fallback: null,
   };
 
   const reducer = Object.assign(reduce, {
@@ -63,15 +64,19 @@ export default function createReducer(handlers = {}, defaultState) {
   }
 
   function reduce(state = defaultState, action) {
-    if (action && handlers[action.type]) {
+    if (!action) { return state; }
+    if (action.type.startsWith('@@redux/')) { return state; }
+
+    const handler = handlers[action.type] || opts.fallback;
+    if (handler) {
       if (opts.payload) {
-        return handlers[action.type](state, action.payload, action.meta);
+        return handler(state, action.payload, action.meta);
       } else {
-        return handlers[action.type](state, action);
+        return handler(state, action);
       }
-    } else {
-      return state;
     }
+
+    return state;
   };
 
   return reducer;
