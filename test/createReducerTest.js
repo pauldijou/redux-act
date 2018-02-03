@@ -45,6 +45,16 @@ describe('createReducer', function () {
     expect(secondReducer).to.be.a('function');
   });
 
+
+  it('should return the default state', function () {
+    const defaultState = 0;
+    const reducer = createReducer({}, defaultState);
+
+    expect(reducer(undefined, {})).to.be.equal(defaultState);
+    expect(reducer(undefined)).to.be.equal(defaultState);
+    expect(reducer()).to.be.equal(defaultState);
+  })
+
   it('should update a store', function () {
     const store = createStore(firstReducer, 0);
     store.dispatch(increment());
