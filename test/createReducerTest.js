@@ -46,12 +46,20 @@ describe('createReducer', function () {
   });
 
 
-  it('should return the default state', function () {
+  it('should return the default state with wrong or empty action', function () {
     const defaultState = 0;
     const reducer = createReducer({}, defaultState);
 
-    expect(reducer(undefined, {})).to.be.equal(defaultState);
     expect(reducer(undefined)).to.be.equal(defaultState);
+    expect(reducer(undefined, {})).to.be.equal(defaultState);
+    expect(reducer(undefined, null)).to.be.equal(defaultState);
+    expect(reducer(undefined, undefined)).to.be.equal(defaultState);
+    expect(reducer(undefined, { type: 1 })).to.be.equal(defaultState);
+    expect(reducer(undefined, { type: '' })).to.be.equal(defaultState);
+    expect(reducer(undefined, { type: true })).to.be.equal(defaultState);
+    expect(reducer(undefined, { type: null })).to.be.equal(defaultState);
+    expect(reducer(undefined, { type: undefined })).to.be.equal(defaultState);
+    expect(reducer(undefined, { type: {} })).to.be.equal(defaultState);
     expect(reducer()).to.be.equal(defaultState);
   });
 

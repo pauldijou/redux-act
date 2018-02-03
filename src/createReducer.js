@@ -64,7 +64,7 @@ export default function createReducer(handlers = {}, defaultState) {
   }
 
   function reduce(state = defaultState, action) {
-    if (!action || !action.type) { return state; }
+    if (!action || (typeof action.type !== 'string')) { return state; }
     if (action.type.startsWith('@@redux/')) { return state; }
 
     const handler = handlers[action.type] || opts.fallback;
