@@ -50,6 +50,7 @@ describe('createReducer', function () {
     const defaultState = 0;
     const reducer = createReducer({}, defaultState);
 
+    expect(reducer()).to.be.equal(defaultState);
     expect(reducer(undefined)).to.be.equal(defaultState);
     expect(reducer(undefined, {})).to.be.equal(defaultState);
     expect(reducer(undefined, null)).to.be.equal(defaultState);
@@ -60,7 +61,6 @@ describe('createReducer', function () {
     expect(reducer(undefined, { type: null })).to.be.equal(defaultState);
     expect(reducer(undefined, { type: undefined })).to.be.equal(defaultState);
     expect(reducer(undefined, { type: {} })).to.be.equal(defaultState);
-    expect(reducer()).to.be.equal(defaultState);
   });
 
   it('should update a store', function () {
