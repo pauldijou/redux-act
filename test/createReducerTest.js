@@ -53,7 +53,7 @@ describe('createReducer', function () {
     expect(reducer(undefined, {})).to.be.equal(defaultState);
     expect(reducer(undefined)).to.be.equal(defaultState);
     expect(reducer()).to.be.equal(defaultState);
-  })
+  });
 
   it('should update a store', function () {
     const store = createStore(firstReducer, 0);

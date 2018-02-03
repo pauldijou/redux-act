@@ -7,14 +7,6 @@ function normalizeType(typeOrActionCreator) {
   return typeOrActionCreator;
 }
 
-function isEmptyObject (obj) {
-  for (const key in obj) {
-      if (obj.hasOwnProperty(key))
-          return false;
-  }
-  return true;
-}
-
 export default function createReducer(handlers = {}, defaultState) {
   const opts = {
     payload: true,
@@ -72,7 +64,7 @@ export default function createReducer(handlers = {}, defaultState) {
   }
 
   function reduce(state = defaultState, action) {
-    if (!action || isEmptyObject(action)) { return state; }
+    if (!action || !action.type) { return state; }
     if (action.type.startsWith('@@redux/')) { return state; }
 
     const handler = handlers[action.type] || opts.fallback;
