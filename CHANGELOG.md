@@ -1,3 +1,7 @@
+# 1.7.0
+
+- Prevent error during reduce if wrong action. (thanks @antonkri97)
+
 # 1.6.0
 
 - Add `fallback` option to handle any non-supported action inside a reducer.
