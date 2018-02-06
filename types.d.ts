@@ -186,6 +186,15 @@ export function disbatch(store: Store<any>): StoreWithDisbatch<any>;
 export function disbatch(store: Store<any>, ...actions: Action<any, any>[]): void;
 export function disbatch(store: Store<any>, actions: Action<any, any>[]): void;
 
+//Loggers
+interface Loggers {
+  reduxLogger: {
+    logger: {}
+    actionTransformer(action: Action<any, any>): Action<any, any>
+  }
+}
+
+export const loggers: Loggers;
 
 // types
 export namespace types {
