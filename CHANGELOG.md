@@ -1,3 +1,7 @@
+# 1.7.1
+
+- Add missing TS types. (thanks @ZachStoltz)
+
 # 1.7.0
 
 - Prevent error during reduce if wrong action. (thanks @antonkri97)
