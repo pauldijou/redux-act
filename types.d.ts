@@ -1,3 +1,5 @@
+import * as Redux from 'redux'
+
 // Generic stuff
 interface Identity<T> {
   (arg: T): T
@@ -143,7 +145,7 @@ type ActionCreatorOrString5<Arg1, Arg2, Arg3, Arg4, Arg5, P, M={}> = ActionCreat
 type ActionCreatorOrString6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M={}> = ActionCreator6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M> | string
 
 interface Reducer<S> {
-  (state: S, action: Action<any, any>): S
+  (state: S, action: Redux.AnyAction): S
 
   options(opts: Object): Reducer<S>
   has(actionCreator: ActionCreatorOrString<any, any>): boolean
