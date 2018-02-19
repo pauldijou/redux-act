@@ -1,3 +1,7 @@
+# 1.7.2
+
+- Use TS types from Redux. (thanks @AlexGalays)
+
 # 1.7.1
 
 - Add missing TS types. (thanks @ZachStoltz)
