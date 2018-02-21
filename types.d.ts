@@ -163,11 +163,11 @@ interface Handlers<S> {
   [propertyName: string]: Handler<S, any, any>
 }
 
-type functionOn<S, P, M={}> = (actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>) => Reducer<S>
+type functionOn<S> = <P, M>(actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>) => Reducer<S>
 type functionOff<S> = (actionCreator: ActionCreatorOrString<any, any>) => Reducer<S>
 
 interface OnOff<S> {
-  (on: functionOn<S, any, any>, off: functionOff<S>): void;
+  (on: functionOn<S>, off: functionOff<S>): void;
 }
 
 export function createReducer<S>(handlers: Handlers<S> | OnOff<S>, defaultState?: S): Reducer<S>;
