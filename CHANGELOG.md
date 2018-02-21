@@ -1,3 +1,7 @@
+# 1.7.3
+
+- Improve `reducer.on` typing. (thanks @AlexGalays)
+
 # 1.7.2
 
 - Use TS types from Redux. (thanks @AlexGalays)
