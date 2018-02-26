@@ -13,6 +13,8 @@ yarn add redux-act
 
 You can also use a [browser friendly compiled file](https://unpkg.com/redux-act@latest/dist/redux-act.js) or the [minified version](https://unpkg.com/redux-act@latest/dist/redux-act.min.js) from NPM CDN (mostly for online demo / snippets).
 
+**Browser support**: this lib uses `String.prototype.startsWith` which is not supported by IE11. Be sure to add a polyfill if you are targeting this browser. [Learn more](https://github.com/pauldijou/redux-act/pull/77).
+
 ## Content
 
 - [Usage](#usage)
