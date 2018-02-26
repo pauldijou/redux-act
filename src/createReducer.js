@@ -64,8 +64,12 @@ export default function createReducer(handlers = {}, defaultState) {
   }
 
   function reduce(state = defaultState, action) {
+    const prefix = "@@redux/";
+    const actionStartsWithPrefix = actionType => 
+      action.type.substring(0, prefix.length) === prefix
+      
     if (!action || (typeof action.type !== 'string')) { return state; }
-    if (action.type.startsWith('@@redux/')) { return state; }
+    if (actionStartsWithPrefix(action.type)) { return state; }
 
     const handler = handlers[action.type] || opts.fallback;
     if (handler) {
