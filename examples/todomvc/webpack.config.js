@@ -18,6 +18,7 @@ module.exports = {
     new webpack.NoErrorsPlugin()
   ],
   resolve: {
+    extensions: ["", ".js", ".jsx"],
     alias: {
       'redux-act': path.join(__dirname, '..', '..', 'lib')
     }
@@ -25,7 +26,7 @@ module.exports = {
   module: {
     loaders: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         loaders: [ 'babel' ],
         exclude: /node_modules/,
         include: __dirname
