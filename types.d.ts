@@ -8,6 +8,7 @@ interface Identity<T> {
 interface Action<P, M={}> {
   type: string;
   payload: P;
+  error: boolean;
   meta?: M;
 }
 
@@ -49,54 +50,63 @@ interface ComplexActionCreator<P, M={}> extends BaseActionCreator<ComplexActionC
   (...args: any[]): Action<P, M>;
 
   raw(...args: any[]): Action<P, M>;
+  asError(...args: any[]): Action<P, M>;
 }
 
 interface ComplexActionCreator1<Arg1, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
   (arg1: Arg1): Action<P, M>;
 
   raw(arg1: Arg1): Action<P, M>;
+  asError(arg1: Arg1): Action<P, M>;
 }
 
 interface ComplexActionCreator2<Arg1, Arg2, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
   (arg1: Arg1, arg2: Arg2): Action<P, M>;
 
   raw(arg1: Arg1, arg2: Arg2): Action<P, M>;
+  asError(arg1: Arg1, arg2: Arg2): Action<P, M>;
 }
 
 interface ComplexActionCreator3<Arg1, Arg2, Arg3, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
   (arg1: Arg1, arg2: Arg2, arg3: Arg3): Action<P, M>;
 
   raw(arg1: Arg1, arg2: Arg2, arg3: Arg3): Action<P, M>;
+  asError(arg1: Arg1, arg2: Arg2, arg3: Arg3): Action<P, M>;
 }
 
 interface ComplexActionCreator4<Arg1, Arg2, Arg3, Arg4, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
   (arg1: Arg1, arg2: Arg2, arg3: Arg3, arg4: Arg4): Action<P, M>;
 
   raw(arg1: Arg1, arg2: Arg2, arg3: Arg3, arg4: Arg4): Action<P, M>;
+  asError(arg1: Arg1, arg2: Arg2, arg3: Arg3, arg4: Arg4): Action<P, M>;
 }
 
 interface ComplexActionCreator5<Arg1, Arg2, Arg3, Arg4, Arg5, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
   (arg1: Arg1, arg2: Arg2, arg3: Arg3, arg4: Arg4, arg5: Arg5): Action<P, M>;
 
   raw(arg1: Arg1, arg2: Arg2, arg3: Arg3, arg4: Arg4, arg5: Arg5): Action<P, M>;
+  asError(arg1: Arg1, arg2: Arg2, arg3: Arg3, arg4: Arg4, arg5: Arg5): Action<P, M>;
 }
 
 interface ComplexActionCreator6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
   (arg1: Arg1, arg2: Arg2, arg3: Arg3, arg4: Arg4, arg5: Arg5, arg6: Arg6): Action<P, M>;
 
   raw(arg1: Arg1, arg2: Arg2, arg3: Arg3, arg4: Arg4, arg5: Arg5, arg6: Arg6): Action<P, M>;
+  asError(arg1: Arg1, arg2: Arg2, arg3: Arg3, arg4: Arg4, arg5: Arg5, arg6: Arg6): Action<P, M>;
 }
 
 interface SimpleActionCreator<P, M={}> extends BaseActionCreator<SimpleActionCreator<P, M>>  {
   (payload: P): Action<P, M>;
 
   raw(payload: P): Action<P, M>;
+  asError(payload: P): Action<P, M>;
 }
 
 interface EmptyActionCreator extends BaseActionCreator<EmptyActionCreator> {
   (): Action<null, null>;
 
   raw(): Action<null, null>;
+  asError(): Action<null, null>;
 }
 
 type ActionCreator<P, M={}> = SimpleActionCreator<P, M> | ComplexActionCreator<P, M> | EmptyActionCreator;
@@ -197,6 +207,9 @@ interface Loggers {
 }
 
 export const loggers: Loggers;
+
+// asError
+export function asError<P, M>(action: Action<P, M>): Action<P, M>;
 
 // types
 export namespace types {
