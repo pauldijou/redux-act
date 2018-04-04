@@ -29,6 +29,7 @@ You can also use a [browser friendly compiled file](https://unpkg.com/redux-act@
   - [bindAll](#bindallactioncreators-stores)
   - [batch](#batchactions)
   - [disbatch](#disbatchstore--dispatch-actions)
+  - [asError](#aserroraction)
   - [types](#types)
 - [Cookbook](#cookbook)
   - [Compatibility](#compatibility)
