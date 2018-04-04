@@ -209,7 +209,7 @@ interface Loggers {
 export const loggers: Loggers;
 
 // asError
-export function asError(action: Action<any, any>): Action<any, any>;
+export function asError<P, M>(action: Action<P, M>): Action<P, M>;
 
 // types
 export namespace types {
