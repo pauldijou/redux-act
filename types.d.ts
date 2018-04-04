@@ -56,6 +56,7 @@ interface ComplexActionCreator<P, M={}> extends BaseActionCreator<ComplexActionC
 interface ComplexActionCreator1<Arg1, P, M={}> extends BaseActionCreator<ComplexActionCreator<P, M>> {
   (arg1: Arg1): Action<P, M>;
 
+  raw(arg1: Arg1): Action<P, M>;
   asError(arg1: Arg1): Action<P, M>;
 }
 
