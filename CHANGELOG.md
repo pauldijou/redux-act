@@ -1,3 +1,7 @@
+# 1.7.4
+
+- Add `asError` typings. (thanks @mdwagner)
+
 # 1.7.3
 
 - Improve `reducer.on` typing. (thanks @AlexGalays)
