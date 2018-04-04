@@ -8,6 +8,7 @@ interface Identity<T> {
 interface Action<P, M={}> {
   type: string;
   payload: P;
+  error: boolean;
   meta?: M;
 }
 
@@ -207,7 +208,7 @@ interface Loggers {
 export const loggers: Loggers;
 
 // asError
-export function asError(action: ActionCreator<any, any>): SimpleActionCreator<any, any> | ComplexActionCreator<any, any> | EmptyActionCreator;
+export function asError(action: Action<any, any>): Action<any, any>;
 
 // types
 export namespace types {
