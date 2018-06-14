@@ -8,7 +8,7 @@ interface Identity<T> {
 interface Action<P, M={}> {
   type: string;
   payload: P;
-  error: boolean;
+  error?: boolean;
   meta?: M;
 }
 
