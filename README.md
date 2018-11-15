@@ -139,7 +139,7 @@ doSomething(1); // { type: 'STRING_CONSTANT', payload: 1}
 
 // Little bonus, if you need to support metadata around your action,
 // like needed data but not really part of the payload, you add a second function
-const metaAction = createAction('desc', arg => arg, arg => ({meta: 'so meta!'}));
+const metaAction = createAction('desc', arg => arg, arg => 'so meta!');
 
 // Metadata will be the third argument of the reduce function
 createReducer({
