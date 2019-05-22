@@ -154,8 +154,8 @@ type ActionCreatorOrString4<Arg1, Arg2, Arg3, Arg4, P, M={}> = ActionCreator4<Ar
 type ActionCreatorOrString5<Arg1, Arg2, Arg3, Arg4, Arg5, P, M={}> = ActionCreator5<Arg1, Arg2, Arg3, Arg4, Arg5, P, M> | string
 type ActionCreatorOrString6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M={}> = ActionCreator6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M> | string
 
-interface Reducer<S> {
-  (state: S, action: Redux.AnyAction): S
+interface Reducer<S, A extends Redux.Action = Redux.AnyAction> {
+  (state: S | undefined, action: A): S
 
   options(opts: Object): Reducer<S>
   has(actionCreator: ActionCreatorOrString<any, any>): boolean

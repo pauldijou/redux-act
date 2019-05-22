@@ -1,6 +1,7 @@
 import {
   createAction, createReducer, batch, disbatch, types
 } from '../types'
+import {combineReducers} from 'redux';
 
 const actionCreators = [
   createAction(),
@@ -28,14 +29,14 @@ emptyAction();
 function onOff(on, off) {
   on(act1, () => 1)
 }
-
-const reducers = [
-  createReducer({}),
-  createReducer({}, {}),
-  createReducer<number>({ [act1.getType()]: () => 1 }, 0),
-  createReducer<boolean>(onOff, true),
-  createReducer<number>(onOff, 1)
-]
+const a1 = createReducer({});
+const reducers = combineReducers({
+  a1, 
+  a2 :createReducer({}, {}),
+  a3 :createReducer<number>({ [act1.getType()]: () => 1 }, 0),
+  a4 :createReducer<boolean>(onOff, true),
+  a5 :createReducer<number>(onOff, 1)
+});
 
 const batches = [
   batch(act1(), act1()),
