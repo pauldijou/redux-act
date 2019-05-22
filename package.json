@@ -1,6 +1,6 @@
 {
   "name": "redux-act",
-  "version": "1.7.4",
+  "version": "1.8.0",
   "license": "Apache-2.0",
   "description": "An opinionated lib to create actions and reducers for Redux",
   "keywords": [
@@ -37,11 +37,11 @@
     "isparta": "^4.0.0",
     "mocha": "^4.0.1",
     "mocha-better-spec-reporter": "^3.1.0",
-    "redux": "^3.7.2",
+    "redux": "^4.0.1",  
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
-    "typescript": "^2.5.3",
-    "typescript-definition-tester": "0.0.5",
+    "typescript": "^3.4.5",
+    "typescript-definition-tester": "0.0.6",
     "uglify-js": "^3.1.6"
   },
   "scripts": {
