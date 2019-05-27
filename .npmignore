@@ -2,3 +2,4 @@ test
 coverage
 examples
 .babelrc
+.nyc_output
