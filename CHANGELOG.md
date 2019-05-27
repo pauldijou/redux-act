@@ -1,3 +1,8 @@
+# 1.7.5
+
+- Improve README. (thanks @samiskin)
+- TypeScript support for Redux 4. (thanks @AbraaoAlves)
+
 # 1.7.4
 
 - Add `asError` typings. (thanks @mdwagner)
@@ -231,9 +236,15 @@ bindedAction.dispatched(); // true
 You can now have some metadata. It's just as the payload, you need a function to reduce the arguments as a metadata object and it will be the third argument inside the reducer.
 
 ```javascript
-const doStuff = createAction('do some stuff', arg => arg, (one, two)=> {so: 'meta'});
+const doStuff = createAction(
+  'do some stuff',
+  arg => arg,
+  (one, two) => {
+    so: 'meta';
+  }
+);
 const reducer = createReducer({
-  [doStuff]: (state, payload, meta)=> payload
+  [doStuff]: (state, payload, meta) => payload
 });
 ```
 
@@ -242,7 +253,13 @@ const reducer = createReducer({
 Sometimes, you need to share actions between client and server, or between clients. You can no longer rely on id generated at runtime, you need to use strict manually provided constants. That's not the main goal of the lib, but if you really need it, just use a fully uppercase description and it will be use as the id.
 
 ```javascript
-const serializedDoStuff = createAction('DO_STUFF', arg => arg, (one, two)=> {so: 'meta'});
+const serializedDoStuff = createAction(
+  'DO_STUFF',
+  arg => arg,
+  (one, two) => {
+    so: 'meta';
+  }
+);
 ```
 
 # 0.1.1

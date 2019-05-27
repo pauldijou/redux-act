@@ -1,6 +1,6 @@
 {
   "name": "redux-act",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "license": "Apache-2.0",
   "description": "An opinionated lib to create actions and reducers for Redux",
   "keywords": [
@@ -24,6 +24,10 @@
   },
   "bugs": {
     "url": "https://github.com/pauldijou/redux-act/issues"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "singleQuote": true
   },
   "devDependencies": {
     "@babel/cli": "7.4.4",
