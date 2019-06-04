@@ -9,7 +9,11 @@ const actionCreators = [
   createAction('aze', () => true),
   createAction('aze', () => true, () => 1),
   createAction(() => 1),
-  createAction(() => "a", () => true)
+  createAction(() => "a", () => true),
+  createAction('aze', ({ a }) => ({ a }), ({ a }) => ({ a })),
+  createAction('aze', ({ a }, { b }) => ({ a, b }), ({ a }, { b }) => ({ a, b })),
+  createAction(({ a }) => ({ a }), ({ a }) => ({ a })),
+  createAction(({ a }, { b }) => ({ a, b }), ({ a }, { b }) => ({ a, b })),
 ]
 
 const act1 = createAction((count: number) => count + 1)

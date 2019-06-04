@@ -132,12 +132,12 @@ export function createAction(description: string): EmptyActionCreator;
 export function createAction<P, M={}>(): SimpleActionCreator<P, M>;
 export function createAction<P, M={}>(description: string): SimpleActionCreator<P, M>;
 
-export function createAction<Arg1, P, M={}>(description: string, payloadReducer: PayloadReducer1<Arg1, P>): ComplexActionCreator1<Arg1, P, M>;
-export function createAction<Arg1, Arg2, P, M={}>(description: string, payloadReducer: PayloadReducer2<Arg1, Arg2, P>): ComplexActionCreator2<Arg1, Arg2, P, M>;
-export function createAction<Arg1, Arg2, Arg3, P, M={}>(description: string, payloadReducer: PayloadReducer3<Arg1, Arg2, Arg3, P>): ComplexActionCreator3<Arg1, Arg2, Arg3, P, M>;
-export function createAction<Arg1, Arg2, Arg3, Arg4, P, M={}>(description: string, payloadReducer: PayloadReducer4<Arg1, Arg2, Arg3, Arg4, P>): ComplexActionCreator4<Arg1, Arg2, Arg3, Arg4, P, M>;
-export function createAction<Arg1, Arg2, Arg3, Arg4, Arg5, P, M={}>(description: string, payloadReducer: PayloadReducer5<Arg1, Arg2, Arg3, Arg4, Arg5, P>): ComplexActionCreator5<Arg1, Arg2, Arg3, Arg4, Arg5, P, M>;
-export function createAction<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M={}>(description: string, payloadReducer: PayloadReducer6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P>): ComplexActionCreator6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M>;
+export function createAction<Arg1, P, M={}>(description: string, payloadReducer: PayloadReducer1<Arg1, P>, metaReducer?: MetaReducer<M>): ComplexActionCreator1<Arg1, P, M>;
+export function createAction<Arg1, Arg2, P, M={}>(description: string, payloadReducer: PayloadReducer2<Arg1, Arg2, P>, metaReducer?: MetaReducer<M>): ComplexActionCreator2<Arg1, Arg2, P, M>;
+export function createAction<Arg1, Arg2, Arg3, P, M={}>(description: string, payloadReducer: PayloadReducer3<Arg1, Arg2, Arg3, P>, metaReducer?: MetaReducer<M>): ComplexActionCreator3<Arg1, Arg2, Arg3, P, M>;
+export function createAction<Arg1, Arg2, Arg3, Arg4, P, M={}>(description: string, payloadReducer: PayloadReducer4<Arg1, Arg2, Arg3, Arg4, P>, metaReducer?: MetaReducer<M>): ComplexActionCreator4<Arg1, Arg2, Arg3, Arg4, P, M>;
+export function createAction<Arg1, Arg2, Arg3, Arg4, Arg5, P, M={}>(description: string, payloadReducer: PayloadReducer5<Arg1, Arg2, Arg3, Arg4, Arg5, P>, metaReducer?: MetaReducer<M>): ComplexActionCreator5<Arg1, Arg2, Arg3, Arg4, Arg5, P, M>;
+export function createAction<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M={}>(description: string, payloadReducer: PayloadReducer6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P>, metaReducer?: MetaReducer<M>): ComplexActionCreator6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M>;
 
 export function createAction<P, M={}>(description: string, payloadReducer:PayloadReducer<P>): ComplexActionCreator<P, M>;
 export function createAction<P, M={}>(description: string, payloadReducer: PayloadReducer<P>, metaReducer?: MetaReducer<M>): ComplexActionCreator<P, M>;
