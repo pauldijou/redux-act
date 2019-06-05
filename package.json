@@ -1,6 +1,6 @@
 {
   "name": "redux-act",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "license": "Apache-2.0",
   "description": "An opinionated lib to create actions and reducers for Redux",
   "keywords": [

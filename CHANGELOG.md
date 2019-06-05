@@ -1,3 +1,7 @@
+# 1.7.6
+
+- Improve TS types around meta reducer. (thanks @megawac)
+
 # 1.7.5
 
 - Improve README. (thanks @samiskin)
