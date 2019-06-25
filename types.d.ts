@@ -159,13 +159,13 @@ interface Reducer<S, A extends Redux.Action = Redux.AnyAction> {
 
   options(opts: Object): Reducer<S>
   has(actionCreator: ActionCreatorOrString<any, any>): boolean
-  on<P, M={}>(actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>): Reducer<S>
-  on<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M={}>(actionCreator: ActionCreatorOrString6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M>, handler: Handler<S, P, M>): Reducer<S>
-  on<Arg1, Arg2, Arg3, Arg4, Arg5, P, M={}>(actionCreator: ActionCreatorOrString5<Arg1, Arg2, Arg3, Arg4, Arg5, P, M>, handler: Handler<S, P, M>): Reducer<S>
-  on<Arg1, Arg2, Arg3, Arg4, P, M={}>(actionCreator: ActionCreatorOrString4<Arg1, Arg2, Arg3, Arg4, P, M>, handler: Handler<S, P, M>): Reducer<S>
-  on<Arg1, Arg2, Arg3, P, M={}>(actionCreator: ActionCreatorOrString3<Arg1, Arg2, Arg3, P, M>, handler: Handler<S, P, M>): Reducer<S>
-  on<Arg1, Arg2, P, M={}>(actionCreator: ActionCreatorOrString2<Arg1, Arg2, P, M>, handler: Handler<S, P, M>): Reducer<S>
   on<Arg1, P, M={}>(actionCreator: ActionCreatorOrString1<Arg1, P, M>, handler: Handler<S, P, M>): Reducer<S>
+  on<Arg1, Arg2, P, M={}>(actionCreator: ActionCreatorOrString2<Arg1, Arg2, P, M>, handler: Handler<S, P, M>): Reducer<S>
+  on<Arg1, Arg2, Arg3, P, M={}>(actionCreator: ActionCreatorOrString3<Arg1, Arg2, Arg3, P, M>, handler: Handler<S, P, M>): Reducer<S>
+  on<Arg1, Arg2, Arg3, Arg4, P, M={}>(actionCreator: ActionCreatorOrString4<Arg1, Arg2, Arg3, Arg4, P, M>, handler: Handler<S, P, M>): Reducer<S>
+  on<Arg1, Arg2, Arg3, Arg4, Arg5, P, M={}>(actionCreator: ActionCreatorOrString5<Arg1, Arg2, Arg3, Arg4, Arg5, P, M>, handler: Handler<S, P, M>): Reducer<S>
+  on<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M={}>(actionCreator: ActionCreatorOrString6<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, P, M>, handler: Handler<S, P, M>): Reducer<S>
+  on<P, M={}>(actionCreator: ActionCreatorOrString<P, M>, handler: Handler<S, P, M>): Reducer<S>
   off(actionCreator: ActionCreatorOrString<any, any>): Reducer<S>
 }
 
