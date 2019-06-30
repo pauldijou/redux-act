@@ -1,3 +1,7 @@
+# 1.7.7
+
+- Improve TS types around `on` function for reducers. (thanks @Tenga)
+
 # 1.7.6
 
 - Improve TS types around meta reducer. (thanks @megawac)
