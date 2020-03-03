@@ -11,6 +11,7 @@
     "batch"
   ],
   "main": "lib/index.js",
+  "module": "src/index.js",
   "types": "./types.d.ts",
   "typings": "./types.d.ts",
   "homepage": "https://github.com/pauldijou/redux-act",
