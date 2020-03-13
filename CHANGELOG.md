@@ -1,3 +1,7 @@
+# 1.7.8
+
+- Add ability to natively import es6 modules. (thanks @Ptico)
+
 # 1.7.7
 
 - Improve TS types around `on` function for reducers. (thanks @Tenga)
