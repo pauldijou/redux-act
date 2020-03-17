@@ -1,3 +1,7 @@
+# 1.7.9
+
+- Rollback previous release.
+
 # 1.7.8
 
 - Add ability to natively import es6 modules. (thanks @Ptico)

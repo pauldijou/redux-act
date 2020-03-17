@@ -1,6 +1,6 @@
 {
   "name": "redux-act",
-  "version": "1.7.8",
+  "version": "1.7.9",
   "license": "Apache-2.0",
   "description": "An opinionated lib to create actions and reducers for Redux",
   "keywords": [
@@ -11,7 +11,6 @@
     "batch"
   ],
   "main": "lib/index.js",
-  "module": "src/index.js",
   "types": "./types.d.ts",
   "typings": "./types.d.ts",
   "homepage": "https://github.com/pauldijou/redux-act",
