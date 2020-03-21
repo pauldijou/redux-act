@@ -11,6 +11,7 @@
     "batch"
   ],
   "main": "lib/index.js",
+  "module": "esm/index.js",
   "types": "./types.d.ts",
   "typings": "./types.d.ts",
   "homepage": "https://github.com/pauldijou/redux-act",
@@ -27,7 +28,9 @@
   },
   "scripts": {
     "clean": "rm -rf lib",
-    "build": "babel src --out-dir lib",
+    "build:commonjs": "MODULE_TARGET=commonjs babel src --out-dir lib",
+    "build:esm": "MODULE_TARGET=esm babel src --out-dir esm",
+    "build": "yarn build:commonjs && yarn build:esm",
     "browserify": "mkdir -p dist && browserify -s ReduxAct lib/index.js > dist/redux-act.js",
     "minify": "terser dist/redux-act.js -o dist/redux-act.min.js",
     "prepublish": "yarn clean && yarn build && yarn browserify && yarn minify",

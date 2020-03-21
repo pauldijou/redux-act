@@ -1,5 +1,6 @@
 node_modules
 lib
+esm
 coverage
 dist
 .nyc_output
