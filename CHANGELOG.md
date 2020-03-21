@@ -1,3 +1,7 @@
+# 1.8.0
+
+- Correctly support ESM build. (thanks @AndyOGo and @LucaMele)
+
 # 1.7.9
 
 - Rollback previous release.
