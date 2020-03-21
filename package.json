@@ -25,31 +25,6 @@
   "bugs": {
     "url": "https://github.com/pauldijou/redux-act/issues"
   },
-  "prettier": {
-    "tabWidth": 2,
-    "singleQuote": true
-  },
-  "devDependencies": {
-    "@babel/cli": "7.4.4",
-    "@babel/core": "7.4.5",
-    "@babel/node": "7.4.5",
-    "@babel/plugin-proposal-object-rest-spread": "7.4.4",
-    "@babel/plugin-transform-object-assign": "7.2.0",
-    "@babel/preset-env": "7.4.5",
-    "@babel/register": "7.4.4",
-    "browserify": "16.2.3",
-    "chai": "4.2.0",
-    "chai-spies-next": "0.9.3",
-    "mocha": "6.1.4",
-    "mocha-better-spec-reporter": "3.1.0",
-    "nyc": "14.1.1",
-    "redux": "4.0.1",
-    "redux-logger": "3.0.6",
-    "redux-thunk": "2.2.0",
-    "terser": "4.0.0",
-    "typescript": "3.4.5",
-    "typescript-definition-tester": "0.0.6"
-  },
   "scripts": {
     "clean": "rm -rf lib",
     "build": "babel src --out-dir lib",
@@ -58,5 +33,30 @@
     "prepublish": "yarn clean && yarn build && yarn browserify && yarn minify",
     "test": "NODE_ENV=test mocha --recursive --require @babel/register --reporter mocha-better-spec-reporter",
     "coverage": "nyc --require @babel/register ./node_modules/.bin/_mocha -- --recursive --reporter mocha-better-spec-reporter"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "singleQuote": true
+  },
+  "devDependencies": {
+    "@babel/cli": "7.8.4",
+    "@babel/core": "7.9.0",
+    "@babel/node": "7.8.7",
+    "@babel/plugin-proposal-object-rest-spread": "7.9.0",
+    "@babel/plugin-transform-object-assign": "7.8.3",
+    "@babel/preset-env": "7.9.0",
+    "@babel/register": "7.9.0",
+    "browserify": "16.5.0",
+    "chai": "4.2.0",
+    "chai-spies-next": "0.9.3",
+    "mocha": "7.1.1",
+    "mocha-better-spec-reporter": "3.1.0",
+    "nyc": "15.0.0",
+    "redux": "4.0.1",
+    "redux-logger": "3.0.6",
+    "redux-thunk": "2.3.0",
+    "terser": "4.6.7",
+    "typescript": "3.8.3",
+    "typescript-definition-tester": "0.0.6"
   }
 }
